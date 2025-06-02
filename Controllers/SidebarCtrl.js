@@ -1,5 +1,5 @@
 import Permissions from "../Models/SidebarModel.js";
-import SubMenuPermissions from "../Models/SubMenuPermissions.js";
+import SubMenuPermissions from "../Models/SubSidebarModel.js";
 import asyncHandler from 'express-async-handler';
 import Role from "../Models/RoleModel.js";
 
