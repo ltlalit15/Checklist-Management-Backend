@@ -7,204 +7,182 @@ import { isValidObjectId } from "../Utills/isValidObjectId.js";
 
 export const createuser = asyncHandler(async (req, res) => {
   try {
+    // Check if username already exists
     const username = await Schema.findOne({ username: req.body.username });
 
     if (!username) {
-      const img = req.uploadedImageUrl
+      // User profile image url jo middleware se aaya hai
+      const img = req.uploadedImageUrl;
+
+      // Naya user create karo
       const data = await Schema.create({
         ...req.body,
         profileimage: img,
       });
 
-      const permission = [
+      // Permission template without fixed _id and userId
+      const permissionTemplate = [
         {
-          "_id": "683d725cbcb71900b5cb2154",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2143", "sidebarName": "Vehicle Management" },
-          "subSidebar": "Insurance",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2143",
+          subSidebar: "Insurance",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d941cbcb71900b5cb216c",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2143", "sidebarName": "Vehicle Management" },
-          "subSidebar": "vehicleType",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2143",
+          subSidebar: "vehicleType",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d947fbcb71900b5cb216f",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2143", "sidebarName": "Vehicle Management" },
-          "subSidebar": "vehicleDivision",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2143",
+          subSidebar: "vehicleDivision",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d949fbcb71900b5cb2170",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2143", "sidebarName": "Vehicle Management" },
-          "subSidebar": "vehicle",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2143",
+          subSidebar: "vehicle",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d963abcb71900b5cb2174",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2144", "sidebarName": "Employee Management" },
-          "subSidebar": "Position",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2144",
+          subSidebar: "Position",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d9653bcb71900b5cb2175",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2144", "sidebarName": "Employee Management" },
-          "subSidebar": "Department",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2144",
+          subSidebar: "Department",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d965cbcb71900b5cb2176",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2144", "sidebarName": "Employee Management" },
-          "subSidebar": "Driver",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2144",
+          subSidebar: "Driver",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d966ebcb71900b5cb2177",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2144", "sidebarName": "Employee Management" },
-          "subSidebar": "DriverList",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2144",
+          subSidebar: "DriverList",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d9689bcb71900b5cb2178",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2145", "sidebarName": "Routes" },
-          "subSidebar": "addRoute",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2145",
+          subSidebar: "addRoute",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d96c8bcb71900b5cb217a",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2145", "sidebarName": "Routes" },
-          "subSidebar": "RouteList",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2145",
+          subSidebar: "RouteList",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d9784bcb71900b5cb217d",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2146", "sidebarName": "Checklist" },
-          "subSidebar": "createChecklist",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2146",
+          subSidebar: "createChecklist",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d9784bcb71900b5cb218e",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2146", "sidebarName": "Checklist" },
-          "subSidebar": "Checklist",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2146",
+          subSidebar: "Checklist",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d97e7bcb71900b5cb217f",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2147", "sidebarName": "Reports" },
-          "subSidebar": "BranchChecklist",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2147",
+          subSidebar: "BranchChecklist",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d9839bcb71900b5cb2180",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2147", "sidebarName": "Reports" },
-          "subSidebar": "RouteChecklist",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2147",
+          subSidebar: "RouteChecklist",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d9854bcb71900b5cb2181",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2147", "sidebarName": "Reports" },
-          "subSidebar": "EconomicunitChecklist",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2147",
+          subSidebar: "EconomicunitChecklist",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d986abcb71900b5cb2182",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2147", "sidebarName": "Reports" },
-          "subSidebar": "AnswerChecklist",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2147",
+          subSidebar: "AnswerChecklist",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d98acbcb71900b5cb2183",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2148", "sidebarName": "User Interface" },
-          "subSidebar": "UserList",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
+          sidebarId: "683d7168bcb71900b5cb2148",
+          subSidebar: "UserList",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
         },
         {
-          "_id": "683d98ccbcb71900b5cb2184",
-          "sidebarId": { "_id": "683d7168bcb71900b5cb2148", "sidebarName": "User Interface" },
-          "subSidebar": "CreateUser",
-          "userId": "663a125ec324210015b222aa",
-          "isEdit": false,
-          "isDelete": false,
-          "isCreate": false,
-          "isGet": true
-        }
-      ]
+          sidebarId: "683d7168bcb71900b5cb2148",
+          subSidebar: "CreateUser",
+          isEdit: false,
+          isDelete: false,
+          isCreate: false,
+          isGet: true,
+        },
+      ];
+
+      // Dynamically set userId for all permissions
+      const permission = permissionTemplate.map((perm) => ({
+        ...perm,
+        userId: data._id,
+      }));
+
+      // Save permissions to DB
       await Permission.create(permission);
+
       res.status(200).json({ data, message: "User created successfully", success: true });
     } else {
       res.status(409).json({ message: "Username already exists", success: false });
     }
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ message: error.message, success: false });
   }
 });
 
