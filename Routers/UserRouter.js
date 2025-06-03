@@ -7,15 +7,16 @@ import {
   editUser,
   deleteUser,
   getAllUser,
-  getAllUserData
+  getAllUserData,
+  getProfile
 } from "../Controllers/UserCtrl.js";
-import { uploadSingleImageToCloudinary } from "../Middewares/singleImgUpload.js";
 const router = express.Router();
 
-router.post("/create-user", upload.single('profileimage'), uploadSingleImageToCloudinary, createuser);
-router.put("/edituser/:id", upload.single('profileimage'), uploadSingleImageToCloudinary, editUser);
+router.post("/create-user", createuser);
+router.put("/edituser/:id", editUser);
 router.delete("/deleteuser/:id", deleteUser);
 router.get("/getalluser", getAllUser);
 router.get("/getalluserdata", getAllUserData);
+router.get("/profile/:id", getProfile); // Assuming you want to get user data by ID
 
 export default router;

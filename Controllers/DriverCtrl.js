@@ -18,8 +18,7 @@ export const createuser = asyncHandler(async (req, res) => {
         profileimage: img,
       });
 
-
-      res.status(200).json({ data, message: "User created successfully", success: true });
+      res.status(200).json({ message: "User created successfully", success: true, data });
     } else {
       res.status(409).json({ message: "Username already exists", success: false });
     }
@@ -60,7 +59,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     message: "Login successful",
-    role,  
+    role,
     user,
     token,
   });

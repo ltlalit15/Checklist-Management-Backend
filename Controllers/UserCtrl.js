@@ -1,29 +1,19 @@
 import Schema from "../Models/UserModel.js";
-import Permission from "../Models/PermissionModel.js";
+import DriverSchema from "../Models/DriverModel.js";
 import asyncHandler from "express-async-handler";
 import { generateToken } from "../Config/jwtToken.js";
 import bcrypt from "bcrypt";
 import { isValidObjectId } from "../Utills/isValidObjectId.js";
 
 export const createuser = asyncHandler(async (req, res) => {
-  try {
-    const username = await Schema.findOne({ username: req.body.username });
+  const existingUser = await Schema.findOne({ username: req.body.username });
 
-    if (!username) {
-      const img = req.uploadedImageUrl;
-
-      const data = await Schema.create({
-        ...req.body,
-        profileimage: img,
-      });
-
-      res.status(200).json({ data, message: "User created successfully", success: true });
-    } else {
-      res.status(409).json({ message: "Username already exists", success: false });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message, success: false });
+  if (existingUser) {
+    return res.status(409).json({ message: "Username already exists", success: false });
   }
+
+  const data = await Schema.create(req.body);
+  res.status(200).json({ data, message: "User created successfully", success: true });
 });
 
 export const loginAdmin = asyncHandler(async (req, res) => {
@@ -107,6 +97,33 @@ export const getAllUserData = asyncHandler(async (req, res) => {
   try {
     const users = await Schema.find({}).select("-password");
     res.status(200).json({ data: users, message: "Users fetched successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message, success: false });
+  }
+});
+
+export const getProfile = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!isValidObjectId(id)) {
+    return res.status(400).json({ message: "Invalid ID format", success: false });
+  }
+
+  try {
+    const user = await Schema.findById(id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found", success: false });
+    }
+
+    const driver = await DriverSchema.findOne({ userId: id });
+
+    if (driver) {
+      user.driverDetails = driver;
+    }
+
+    res.status(200).json({ data: user, message: "User profile fetched successfully", success: true });
+
   } catch (error) {
     res.status(500).json({ message: error.message, success: false });
   }
