@@ -17,6 +17,6 @@ router.put("/edituser/:id", editUser);
 router.delete("/deleteuser/:id", deleteUser);
 router.get("/getalluser", getAllUser);
 router.get("/getalluserdata", getAllUserData);
-router.get("/profile/:id", getProfile); // Assuming you want to get user data by ID
+router.get("/profile/:id", getProfile);
 
 export default router;
