@@ -5,16 +5,15 @@ const permissionSchema = new Schema({
     sidebarId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Sidebar'  // Agar aapka Sidebar collection hai to reference dena achha rahega
+        ref: 'Sidebar'  
     },
     subSidebar: {
         type: String,
         required: true,
     },
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
+    roleId: {
+        type: String,
         required: true,
-        ref: 'User'  // Agar User collection hai to reference dena
     },
     isEdit: {
         type: Boolean,

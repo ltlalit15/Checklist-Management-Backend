@@ -18,15 +18,6 @@ const VehicleSchema = new mongoose.Schema({
     plate: {
         type: String,
     },
-    brand: {
-        type: String,
-    },
-    yearModel: {
-        type: String,
-    },
-    color: {
-        type: String,
-    },
     insuranceCompany: {
         type: String,
     },

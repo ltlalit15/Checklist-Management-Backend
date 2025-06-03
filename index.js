@@ -17,7 +17,9 @@ app.use(cors({
     origin: "*",
     credentials: true,
 }));
-app.use('/uploads', express.static('uploads')); // serve uploaded images
+
+app.use('/uploads', express.static('uploads'));
+
 app.get("/", (req, res) => {
   res.send(`
     <html>

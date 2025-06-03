@@ -9,9 +9,6 @@ export const createVehicle = async (req, res) => {
       vehicleDivision,
       modelName,
       plate,
-      brand,
-      yearModel,
-      color,
       insuranceCompany,
     } = req.body;
 
@@ -23,7 +20,7 @@ export const createVehicle = async (req, res) => {
       ? req.files.vehicleCard[0].path
       : null;
 
-    if (!economicNumber || !vehicleType || !vehicleDivision || !modelName || !plate || !brand || !yearModel || !color) {
+    if (!economicNumber || !vehicleType || !vehicleDivision || !modelName || !plate ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -38,9 +35,6 @@ export const createVehicle = async (req, res) => {
       vehicleDivision,
       modelName,
       plate,
-      brand,
-      yearModel,
-      color,
       insuranceCompany,
       uploadInsurance: insuranceUploadUrl,
       vehicleCard: vehicleCardUploadUrl
@@ -63,9 +57,6 @@ export const updateVehicle = async (req, res) => {
       vehicleDivision,
       modelName,
       plate,
-      brand,
-      yearModel,
-      color,
       insuranceCompany,
     } = req.body;
 
@@ -85,9 +76,6 @@ export const updateVehicle = async (req, res) => {
     vehicle.vehicleDivision = vehicleDivision || vehicle.vehicleDivision;
     vehicle.modelName = modelName || vehicle.modelName;
     vehicle.plate = plate || vehicle.plate;
-    vehicle.brand = brand || vehicle.brand;
-    vehicle.yearModel = yearModel || vehicle.yearModel;
-    vehicle.color = color || vehicle.color;
     vehicle.insuranceCompany = insuranceCompany || vehicle.insuranceCompany;
     if (insuranceUploadUrl) {
       vehicle.uploadInsurance = insuranceUploadUrl;

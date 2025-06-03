@@ -1,4 +1,4 @@
-import Admin from '../Models/AuthModel.js'
+import Admin from '../Models/DriverModel.js'
 import  jwt from "jsonwebtoken"
 import asyncHandler from"express-async-handler"
 

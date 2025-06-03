@@ -1,1 +1,7 @@
-check list create and get me images fronend and backend 
+vehicle type api modify    done
+vehicle api modify         done
+create user api (new api)  done
+role and permsiion         done
+reports 
+dashbaord
+

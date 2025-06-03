@@ -2,8 +2,8 @@ import VehicleType from '../Models/VehicleTypeModel.js';
 
 export const createVehicleType = async (req, res) => {
   try {
-    const { vehicleType, description } = req.body; 
-console.log("Creating vehicle type:", vehicleType, description);
+    const { vehicleType, description, brand, model, color, year } = req.body;
+    console.log("Creating vehicle type:", vehicleType, description);
     if (!vehicleType) {
       return res.status(400).json({ message: "Vehicle type is required" });
     }
@@ -16,6 +16,10 @@ console.log("Creating vehicle type:", vehicleType, description);
     const newVehicleType = new VehicleType({
       vehicleType,
       description,
+      brand,
+      model,
+      color,
+      year
     });
 
     await newVehicleType.save();

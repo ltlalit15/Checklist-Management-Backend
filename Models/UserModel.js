@@ -22,27 +22,8 @@ const userSchema = new Schema(
     phone: {
       type: String,
     },
-    licenseNumber: {
-      type: String,
-    },
-    licenseExpDate: {
-      type: String,
-    },
-    position: {
-      type: String,
-    },
-    department: {
-      type: String,
-    },
-    assignVehicle: {
-      type: String,
-    },
-    profileimage: {
-      type: String,
-    },
     role: {
       type: String,
-      default: "driver",
     },
     passwordResetToken: String,
     passwordResetExpires: Date,

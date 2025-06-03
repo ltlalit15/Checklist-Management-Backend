@@ -1,7 +1,5 @@
 import { Router } from "express";
-import UserRoutes from "./Routers/AuthRouters.js";
-import CategoryRoutes from "./Routers/CategoryRouter.js";
-import CompanyRouter from "./Routers/CompanyRouter.js";
+import UserRoutes from "./Routers/DriverRouters.js";
 import BranchRouter from "./Routers/BranchRouter.js";
 import UnitRouter from "./Routers/UnitRouter.js";
 import RouteRouter from "./Routers/RouteRouters.js";
@@ -15,12 +13,11 @@ import VehicleRouter from "./Routers/VehicleRouter.js";
 import InsuranceRouter from "./Routers/InsuranceRouter.js";
 import PositionRouter from "./Routers/PositionRouter.js";
 import DepartmentRouter from "./Routers/DepartmentRouter.js";
+import UserRouter from "./Routers/UserRouter.js";
 
 const router = Router();
 
 router.use("/api", UserRoutes);
-router.use("/api", CategoryRoutes);
-router.use("/api", CompanyRouter);
 router.use("/api", BranchRouter);
 router.use("/api", UnitRouter);
 router.use("/api", RouteRouter);
@@ -34,5 +31,6 @@ router.use("/api", VehicleRouter);
 router.use("/api", InsuranceRouter);
 router.use("/api", PositionRouter);
 router.use("/api", DepartmentRouter);
+router.use("/api", UserRouter);
 
 export default router;
