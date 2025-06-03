@@ -2,6 +2,7 @@ import Schema from "../Models/RoleModel.js"
 import asyncHandler from 'express-async-handler';
 import Permission from "../Models/PermissionModel.js";
 
+
 export const getRoleWithPermissions = asyncHandler(async (req, res) => {
     try {
         const data = await Schema.find()
@@ -31,6 +32,24 @@ export const createRole = asyncHandler(async (req, res) => {
         });
 
         const permissionTemplate = [
+            {
+                sidebarId: "683d7168bcb71900b5cb2141",
+                subSidebar: null,
+                isEdit: false,
+                isDelete: false,
+                isCreate: false,
+                isGet: true,
+                permission: true
+            },
+            {
+                sidebarId: "683d7168bcb71900b5cb2142",
+                subSidebar: null,
+                isEdit: false,
+                isDelete: false,
+                isCreate: false,
+                isGet: true,
+                permission: true
+            },
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
                 subSidebar: "Insurance",
@@ -106,22 +125,14 @@ export const createRole = asyncHandler(async (req, res) => {
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2145",
-                subSidebar: "addRoute",
+                subSidebar: null,
                 isEdit: false,
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
                 permission: true
             },
-            {
-                sidebarId: "683d7168bcb71900b5cb2145",
-                subSidebar: "RouteList",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
-                isGet: true,
-                permission: true
-            },
+
             {
                 sidebarId: "683d7168bcb71900b5cb2146",
                 subSidebar: "createChecklist",
@@ -179,24 +190,14 @@ export const createRole = asyncHandler(async (req, res) => {
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2148",
-                subSidebar: "UserList",
+                subSidebar: null,
                 isEdit: false,
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
                 permission: true
 
-            },
-            {
-                sidebarId: "683d7168bcb71900b5cb2148",
-                subSidebar: "CreateUser",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
-                isGet: true,
-                permission: true
-
-            },
+            }
         ];
         const permission = permissionTemplate.map((perm) => ({
             ...perm,
@@ -253,41 +254,74 @@ export const deleteRole = asyncHandler(async (req, res) => {
 export const getPermissionByRoleId = asyncHandler(async (req, res) => {
     try {
         const { roleId } = req.params;
+        console.log("Role ID:", roleId); // Debugging line to check roleId
         if (!roleId) {
             return res.status(400).json({ message: "Role ID is required" });
         }
-        const permissions = await Permission.find({ roleId: roleId })
 
-        res.status(200).json({ message: "Permissions fetched successfully", success: true, data: permissions });
+        const permissions = await Permission.find({ roleId: roleId })
+            .populate({
+                path: 'sidebarId',
+                select: 'sidebarName'
+            });
+
+        console.log("Permissions:", permissions); // Debugging line to check fetched permissions
+        const formattedPermissions = permissions.map(p => ({
+            _id: p._id,
+            sidebarName: p.sidebarId.sidebarName,  // direct sidebarName nikal ke
+            subSidebar: p.subSidebar,
+            isEdit: p.isEdit,
+            isDelete: p.isDelete,
+            isCreate: p.isCreate,
+            isGet: p.isGet,
+            permission: p.permission,
+            roleId: p.roleId
+        }));
+
+        res.status(200).json({ message: "Permissions fetched successfully", success: true, data: formattedPermissions });
+
+
     } catch (error) {
-        res.status(404).json(error.message);
+        res.status(500).json({ message: error.message });
     }
 });
 
+
 // edit permission  by id
+
+import mongoose from 'mongoose';
 
 export const editPermissionById = asyncHandler(async (req, res) => {
     try {
         const { id } = req.params;
-        const { isEdit, isDelete, isCreate, isGet } = req.body;
+        const { isEdit, isDelete, isCreate, isGet, permission } = req.body;
 
-        if (!id) {
-            return res.status(400).json({ message: "Permission ID is required" });
+        // Convert id string to ObjectId
+        const roleObjectId = new  mongoose.Types.ObjectId(id);
+
+        // update all documents matching id
+        const updateResult = await Permission.updateMany(
+            { _id: roleObjectId }, // filter condition
+            {
+                $set: {
+                    isEdit,
+                    isDelete,
+                    isCreate,
+                    isGet,
+                    permission
+                }
+            }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(404).json({ message: "No permissions found for this roleId" });
         }
 
-        const permission = await Permission.findById(id);
-        if (!permission) {
-            return res.status(404).json({ message: "Permission not found" });
-        }
-
-        permission.isEdit = isEdit;
-        permission.isDelete = isDelete;
-        permission.isCreate = isCreate;
-        permission.isGet = isGet;
-
-        const updatedPermission = await permission.save();
-        res.status(200).json({ message: "Permission updated successfully", success: true, data: updatedPermission });
+        res.status(200).json({
+            message: `${updateResult.modifiedCount} permission(s) updated successfully`,
+            success: true,
+        });
     } catch (error) {
-        res.status(404).json(error.message);
+        res.status(500).json({ message: error.message });
     }
 });
