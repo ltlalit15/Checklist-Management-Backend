@@ -246,7 +246,7 @@ export const getPermissionByRoleId = asyncHandler(async (req, res) => {
     }
 });
 
-// edit permission by id
+// edit permission  by id
 
 export const editPermissionById = asyncHandler(async (req, res) => {
     try {
