@@ -5,8 +5,9 @@ const permissionSchema = new Schema({
     sidebarId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Sidebar'  
+        ref: 'Sidebar'
     },
+    
     subSidebar: {
         type: String,
         required: true,

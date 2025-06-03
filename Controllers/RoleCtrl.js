@@ -11,8 +11,6 @@ export const getRoleWithPermissions = asyncHandler(async (req, res) => {
     }
 });
 
-
-
 export const createRole = asyncHandler(async (req, res) => {
     try {
 
@@ -40,6 +38,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
@@ -48,6 +47,8 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
+
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
@@ -56,6 +57,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
@@ -64,6 +66,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2144",
@@ -72,6 +75,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2144",
@@ -80,6 +84,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2144",
@@ -88,6 +93,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2144",
@@ -96,6 +102,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2145",
@@ -104,6 +111,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2145",
@@ -112,6 +120,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2146",
@@ -120,6 +129,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2146",
@@ -128,6 +138,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
@@ -136,6 +147,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
@@ -144,6 +156,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
@@ -152,6 +165,8 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
+
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
@@ -160,6 +175,7 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2148",
@@ -168,6 +184,8 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
+
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2148",
@@ -176,6 +194,8 @@ export const createRole = asyncHandler(async (req, res) => {
                 isDelete: false,
                 isCreate: false,
                 isGet: true,
+                permission: true
+
             },
         ];
         const permission = permissionTemplate.map((perm) => ({
@@ -229,18 +249,33 @@ export const deleteRole = asyncHandler(async (req, res) => {
 
 // permission by role id
 
+
 export const getPermissionByRoleId = asyncHandler(async (req, res) => {
     try {
         const { roleId } = req.params;
         if (!roleId) {
             return res.status(400).json({ message: "Role ID is required" });
         }
-        const permissions = await Permission.find({ roleId: roleId });
-        if (!permissions || permissions.length === 0) {
-            return res.status(404).json({ message: "No permissions found for this role" });
-        }
-        
-        res.status(200).json({message: "Permissions fetched successfully", success: true , data: permissions });
+        const permissions = await Permission.find({ roleId: roleId })
+
+        const data = await Promise.all(
+            permissions.map(async (row) => {
+                try {
+                    const name = await getNamesByIds(row.id)
+console.log(row.id, "row.id");
+                    return {
+                        ...row,
+
+                        sidebarName: name[0]?.sidebarName
+
+                    };
+                } catch (error) {
+                   console.error("Error fetching sidebar name:", error);
+                }
+            })
+        );
+
+        res.status(200).json({ message: "Permissions fetched successfully", success: true, data });
     } catch (error) {
         res.status(404).json(error.message);
     }
