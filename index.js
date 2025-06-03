@@ -1,23 +1,40 @@
 import express from "express";
-import bodyParser from "body-parser";
-import { dbConnect } from "./Config/dbConnect.js";
 import dotenv from "dotenv";
+import http from 'http';
+import { Server } from 'socket.io';
+import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
+
+import { dbConnect } from "./Config/dbConnect.js";
 import routes from "./app.js";
+import { handleSocketConnection } from './Utills/SocketHelper.js';
+
 dotenv.config();
+const PORT = process.env.PORT || 6000;
+
 const app = express();
-const PORT = process.env.PORT;
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  },
+});
 
 dbConnect();
 
+app.use(cors());
 app.use(morgan("dev"));
-app.use(cors({
-    origin: "*",
-    credentials: true,
-}));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(cookieParser());
 
+handleSocketConnection(io);
 
 app.get("/", (req, res) => {
   res.send(`
@@ -52,12 +69,9 @@ app.get("/", (req, res) => {
     </html>
   `);
 });
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
-app.use(cookieParser());
 
 app.use(routes);
 
-app.listen(PORT, () => {
-    console.log(`ChecklistManagement Server is running on port ${PORT} ❤❤❤❤`);
+server.listen(PORT, () => {
+  console.log(`✅ ChecklistManagement Server is running on port ${PORT} ❤❤❤❤`);
 });
