@@ -258,24 +258,7 @@ export const getPermissionByRoleId = asyncHandler(async (req, res) => {
         }
         const permissions = await Permission.find({ roleId: roleId })
 
-        const data = await Promise.all(
-            permissions.map(async (row) => {
-                try {
-                    const name = await getNamesByIds(row.id)
-console.log(row.id, "row.id");
-                    return {
-                        ...row,
-
-                        sidebarName: name[0]?.sidebarName
-
-                    };
-                } catch (error) {
-                   console.error("Error fetching sidebar name:", error);
-                }
-            })
-        );
-
-        res.status(200).json({ message: "Permissions fetched successfully", success: true, data });
+        res.status(200).json({ message: "Permissions fetched successfully", success: true, data: permissions });
     } catch (error) {
         res.status(404).json(error.message);
     }
