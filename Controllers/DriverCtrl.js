@@ -29,7 +29,7 @@ export const createuser = asyncHandler(async (req, res) => {
   }
 });
 
-
+import mongoose from "mongoose";
 export const loginAdmin = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
@@ -58,7 +58,8 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   delete user.__v;
 
   const token = generateToken(foundUser._id);
-  const userRole = await roleSchema.findOne({ _id: foundUser.role });
+  console.log(foundUser._id, "foundUser._id");
+const userRole = await roleSchema.findOne({ _id: new mongoose.Types.ObjectId(foundUser.role) });
   console.log("userRole", userRole);
   res.status(200).json({
     message: "Login successful",

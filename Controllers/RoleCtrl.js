@@ -35,36 +35,36 @@ export const createRole = asyncHandler(async (req, res) => {
             {
                 sidebarId: "683d7168bcb71900b5cb2141",
                 subSidebar: null,
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2142",
                 subSidebar: null,
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
                 subSidebar: "Insurance",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
                 subSidebar: "vehicleType",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
 
@@ -72,63 +72,63 @@ export const createRole = asyncHandler(async (req, res) => {
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
                 subSidebar: "vehicleDivision",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
                 subSidebar: "vehicle",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2144",
                 subSidebar: "Position",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2144",
                 subSidebar: "Department",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2144",
                 subSidebar: "Driver",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2144",
                 subSidebar: "DriverList",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2145",
                 subSidebar: null,
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
@@ -136,45 +136,45 @@ export const createRole = asyncHandler(async (req, res) => {
             {
                 sidebarId: "683d7168bcb71900b5cb2146",
                 subSidebar: "createChecklist",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2146",
                 subSidebar: "Checklist",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
                 subSidebar: "BranchChecklist",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
                 subSidebar: "RouteChecklist",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
                 subSidebar: "EconomicunitChecklist",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
 
@@ -182,18 +182,18 @@ export const createRole = asyncHandler(async (req, res) => {
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
                 subSidebar: "AnswerChecklist",
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
             },
             {
                 sidebarId: "683d7168bcb71900b5cb2148",
                 subSidebar: null,
-                isEdit: false,
-                isDelete: false,
-                isCreate: false,
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
                 isGet: true,
                 permission: true
 
@@ -264,7 +264,6 @@ export const getPermissionByRoleId = asyncHandler(async (req, res) => {
                 select: 'sidebarName'
             });
 
-        console.log("Permissions:", permissions); // Debugging line to check fetched permissions
         const formattedPermissions = permissions.map(p => ({
             _id: p._id,
             sidebarName: p.sidebarId.sidebarName,  // direct sidebarName nikal ke

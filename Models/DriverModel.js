@@ -42,7 +42,7 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      default: "driver",
+      default: "68404ac34a61834cb46e049f",
     },
     passwordResetToken: String,
     passwordResetExpires: Date,
