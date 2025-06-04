@@ -1,5 +1,7 @@
 import Schema from "../Models/DriverModel.js";
 import User from "../Models/UserModel.js";
+import roleSchema from "../Models/RoleModel.js";
+
 import Permission from "../Models/PermissionModel.js";
 import asyncHandler from "express-async-handler";
 import { generateToken } from "../Config/jwtToken.js";
@@ -56,10 +58,12 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   delete user.__v;
 
   const token = generateToken(foundUser._id);
-
+  const userRole = await roleSchema.findOne({ _id: foundUser.role });
+  console.log("userRole", userRole);
   res.status(200).json({
     message: "Login successful",
-    role,
+    roleId: userRole ? userRole._id : null,
+    roleName: userRole ? userRole.roleName : role,
     user,
     token,
   });
