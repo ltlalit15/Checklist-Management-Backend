@@ -254,7 +254,6 @@ export const deleteRole = asyncHandler(async (req, res) => {
 export const getPermissionByRoleId = asyncHandler(async (req, res) => {
     try {
         const { roleId } = req.params;
-        console.log("Role ID:", roleId); // Debugging line to check roleId
         if (!roleId) {
             return res.status(400).json({ message: "Role ID is required" });
         }
@@ -291,37 +290,37 @@ export const getPermissionByRoleId = asyncHandler(async (req, res) => {
 
 import mongoose from 'mongoose';
 
-export const editPermissionById = asyncHandler(async (req, res) => {
+export const editPermissionsBulk = asyncHandler(async (req, res) => {
     try {
-        const { id } = req.params;
-        const { isEdit, isDelete, isCreate, isGet, permission } = req.body;
+        const updates = req.body;
 
-        // Convert id string to ObjectId
-        const roleObjectId = new  mongoose.Types.ObjectId(id);
-
-        // update all documents matching id
-        const updateResult = await Permission.updateMany(
-            { _id: roleObjectId }, // filter condition
-            {
-                $set: {
-                    isEdit,
-                    isDelete,
-                    isCreate,
-                    isGet,
-                    permission
-                }
-            }
-        );
-
-        if (updateResult.matchedCount === 0) {
-            return res.status(404).json({ message: "No permissions found for this roleId" });
+        if (!Array.isArray(updates) || updates.length === 0) {
+            return res.status(400).json({ message: "Invalid input data", success: false });
         }
 
+        const bulkOps = updates.map((item) => ({
+            updateOne: {
+                filter: { _id: new mongoose.Types.ObjectId(item._id) },
+                update: {
+                    $set: {
+                        isEdit: item.isEdit,
+                        isDelete: item.isDelete,
+                        isCreate: item.isCreate,
+                        isGet: item.isGet,
+                        permission: item.permission,
+                    }
+                }
+            }
+        }));
+
+        const result = await Permission.bulkWrite(bulkOps);
+
         res.status(200).json({
-            message: `${updateResult.modifiedCount} permission(s) updated successfully`,
+            message: `${result.modifiedCount} permissions updated successfully`,
             success: true,
+            result,
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message, success: false });
     }
 });

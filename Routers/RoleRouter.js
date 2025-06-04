@@ -1,5 +1,5 @@
 import express from "express";
-import { getRoleWithPermissions , createRole ,editRole , deleteRole , getPermissionByRoleId , editPermissionById} from "../Controllers/RoleCtrl.js";
+import { getRoleWithPermissions , createRole ,editRole , deleteRole , getPermissionByRoleId , editPermissionsBulk} from "../Controllers/RoleCtrl.js";
 import { authMiddleware } from "../Middewares/authMiddleware.js";
 
 const router = express.Router();
@@ -9,6 +9,6 @@ router.post("/create-role", createRole);
 router.patch("/edit-role/:id", editRole);
 router.delete("/delete-role/:id",deleteRole); 
 router.get("/getpermissions/:roleId", getPermissionByRoleId);
-router.put("/update-permission/:id", editPermissionById);
+router.put("/update-multiple-permissions", editPermissionsBulk);
 
 export default router;
