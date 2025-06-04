@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+
+//       ? req.files.uploadInsurance[0].path
 const VehicleSchema = new mongoose.Schema({
     economicNumber: {
         type: String,
@@ -7,25 +9,26 @@ const VehicleSchema = new mongoose.Schema({
         unique: true
     },
     vehicleType: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'VehicleType',
     },
     vehicleDivision: {
-        type: String,
-    },
-    modelName: {
-        type: String,
-    },
-    plate: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'VehicleDivision',
     },
     insuranceCompany: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Insurance',
     },
     uploadInsurance: {
         type: String,
     },
     vehicleCard: {
         type: String,
+    },
+    brachCode: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
     }
 
 

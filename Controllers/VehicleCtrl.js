@@ -7,12 +7,11 @@ export const createVehicle = async (req, res) => {
       economicNumber,
       vehicleType,
       vehicleDivision,
-      modelName,
-      plate,
       insuranceCompany,
+      brachCode,
     } = req.body;
 
-  const insuranceUploadUrl = req.files?.uploadInsurance
+    const insuranceUploadUrl = req.files?.uploadInsurance
       ? req.files.uploadInsurance[0].path
       : null;
 
@@ -20,9 +19,7 @@ export const createVehicle = async (req, res) => {
       ? req.files.vehicleCard[0].path
       : null;
 
-    if (!economicNumber || !vehicleType || !vehicleDivision || !modelName || !plate ) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+
 
     const existingVehicle = await Vehicle.findOne({ economicNumber });
     if (existingVehicle) {
@@ -33,9 +30,8 @@ export const createVehicle = async (req, res) => {
       economicNumber,
       vehicleType,
       vehicleDivision,
-      modelName,
-      plate,
       insuranceCompany,
+      brachCode,
       uploadInsurance: insuranceUploadUrl,
       vehicleCard: vehicleCardUploadUrl
     });
@@ -57,6 +53,7 @@ export const updateVehicle = async (req, res) => {
       vehicleDivision,
       modelName,
       plate,
+      brachCode,
       insuranceCompany,
     } = req.body;
 
@@ -75,6 +72,7 @@ export const updateVehicle = async (req, res) => {
     vehicle.vehicleType = vehicleType || vehicle.vehicleType;
     vehicle.vehicleDivision = vehicleDivision || vehicle.vehicleDivision;
     vehicle.modelName = modelName || vehicle.modelName;
+    vehicle.brachCode = brachCode || vehicle.brachCode;
     vehicle.plate = plate || vehicle.plate;
     vehicle.insuranceCompany = insuranceCompany || vehicle.insuranceCompany;
     if (insuranceUploadUrl) {
@@ -94,8 +92,23 @@ export const updateVehicle = async (req, res) => {
 // Get all Vehicles
 export const getVehicles = async (req, res) => {
   try {
-    const vehicles = await Vehicle.find()
-  
+    const vehicles = await Vehicle.find().populate({
+      path: 'vehicleType',
+      select: 'vehicleType brand model '
+    })
+      .populate({
+        path: 'vehicleDivision',
+        select: 'divisionName'
+      })
+      .populate({
+        path: 'insuranceCompany',
+        select: 'companyName'
+      })
+      .populate({
+        path: 'brachCode',
+        select: 'branchCode'
+      });
+
     res.status(200).json(vehicles);
   } catch (error) {
     res.status(500).json({ message: error.message });
