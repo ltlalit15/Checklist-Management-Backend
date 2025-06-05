@@ -50,18 +50,10 @@ export const createRole = asyncHandler(async (req, res) => {
                 isGet: true,
                 permission: true
             },
+           
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
-                subSidebar: "Insurance",
-                isEdit: true,
-                isDelete: true,
-                isCreate: true,
-                isGet: true,
-                permission: true
-            },
-            {
-                sidebarId: "683d7168bcb71900b5cb2143",
-                subSidebar: "vehicleType",
+                subSidebar: "VehicleType",
                 isEdit: true,
                 isDelete: true,
                 isCreate: true,
@@ -72,6 +64,15 @@ export const createRole = asyncHandler(async (req, res) => {
             {
                 sidebarId: "683d7168bcb71900b5cb2143",
                 subSidebar: "vehicleDivision",
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
+                isGet: true,
+                permission: true
+            },
+             {
+                sidebarId: "683d7168bcb71900b5cb2143",
+                subSidebar: "Insurance",
                 isEdit: true,
                 isDelete: true,
                 isCreate: true,
@@ -135,7 +136,7 @@ export const createRole = asyncHandler(async (req, res) => {
 
             {
                 sidebarId: "683d7168bcb71900b5cb2146",
-                subSidebar: "createChecklist",
+                subSidebar: "CreateChecklist",
                 isEdit: true,
                 isDelete: true,
                 isCreate: true,
@@ -197,14 +198,15 @@ export const createRole = asyncHandler(async (req, res) => {
                 isGet: true,
                 permission: true
 
-            }
+            },
         ];
         const permission = permissionTemplate.map((perm) => ({
             ...perm,
             roleId: roles._id,
         }));
 
-        const RolePermission = await Permission.create(permission);
+        const RolePermission = await Permission.insertMany(permission, { ordered: true });
+
 
         res.status(200).json({ roles, message: "Role created successfully", success: true, RolePermission });
     } catch (error) {
