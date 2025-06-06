@@ -24,6 +24,7 @@ const userSchema = new Schema(
     },
     driverStatus: {
       type: Boolean,
+      default: true
     },
     role: {
       type: mongoose.Schema.Types.ObjectId,
