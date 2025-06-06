@@ -8,7 +8,8 @@ import {
   editUser,
   deleteUser,
   getAllUser,
-  getAllUserData
+  getAllUserData,
+  toogleStatus
 } from "../Controllers/DriverCtrl.js";
 import { uploadSingleImageToCloudinary } from "../Middewares/singleImgUpload.js";
 const router = express.Router();
@@ -19,5 +20,6 @@ router.put("/editdriver/:id", upload.single('profileimage'), uploadSingleImageTo
 router.delete("/deletedriver/:id", deleteUser);
 router.get("/getalldriver", getAllUser);
 router.get("/getalldriverdata", getAllUserData);
+router.patch("/toogleStatus/:id", toogleStatus);
 
 export default router;

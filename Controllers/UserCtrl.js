@@ -1,4 +1,6 @@
 import Schema from "../Models/UserModel.js";
+import Role from "../Models/RoleModel.js";
+
 import DriverSchema from "../Models/DriverModel.js";
 import asyncHandler from "express-async-handler";
 import { generateToken } from "../Config/jwtToken.js";
@@ -74,7 +76,8 @@ export const getAllUser = asyncHandler(async (req, res) => {
 
 export const getAllUserData = asyncHandler(async (req, res) => {
   try {
-    const users = await Schema.find({}).select("-password");
+    const users = await Schema.find({}).select("-password") .populate('role', 'roleName') // populate role field but only roleName
+  .exec();;
     res.status(200).json({ data: users, message: "Users fetched successfully", success: true });
   } catch (error) {
     res.status(500).json({ message: error.message, success: false });

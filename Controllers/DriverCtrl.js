@@ -1,7 +1,7 @@
 import Schema from "../Models/DriverModel.js";
 import User from "../Models/UserModel.js";
-import roleSchema from "../Models/RoleModel.js";
-
+import Role from "../Models/RoleModel.js";
+import mongoose from "mongoose";
 import Permission from "../Models/PermissionModel.js";
 import asyncHandler from "express-async-handler";
 import { generateToken } from "../Config/jwtToken.js";
@@ -29,7 +29,6 @@ export const createuser = asyncHandler(async (req, res) => {
   }
 });
 
-import mongoose from "mongoose";
 export const loginAdmin = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
@@ -46,6 +45,9 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     role = foundUser.role;
   }
 
+  if (foundUser.driverStatus !== true) {
+    return res.status(403).json({ message: "Permission denied. User is inactive." });
+  }
   const isPasswordMatch = await bcrypt.compare(password, foundUser.password);
   if (!isPasswordMatch) {
     return res.status(401).json({ message: "Invalid username or password" });
@@ -59,7 +61,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
   const token = generateToken(foundUser._id);
   console.log(foundUser._id, "foundUser._id");
-const userRole = await roleSchema.findOne({ _id: new mongoose.Types.ObjectId(foundUser.role) });
+  const userRole = await Role.findOne({ _id: new mongoose.Types.ObjectId(foundUser.role) });
   console.log("userRole", userRole);
   res.status(200).json({
     message: "Login successful",
@@ -69,8 +71,6 @@ const userRole = await roleSchema.findOne({ _id: new mongoose.Types.ObjectId(fou
     token,
   });
 });
-
-
 
 export const editUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -135,3 +135,19 @@ export const getAllUserData = asyncHandler(async (req, res) => {
     res.status(500).json({ message: error.message, success: false });
   }
 });
+
+export const toogleStatus = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params
+    const { driverStatus } = req.body
+    const data = await User.findByIdAndUpdate(
+      id,
+      { driverStatus },
+      { new: true }
+    )
+    res.status(200).json({ message: "Status Updated Sucessfully!", success: true, data });
+  } catch (error) {
+    res.status(500).json({ message: error.message, success: false });
+
+  }
+})

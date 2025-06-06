@@ -13,6 +13,7 @@ import InsuranceRouter from "./Routers/InsuranceRouter.js";
 import PositionRouter from "./Routers/PositionRouter.js";
 import DepartmentRouter from "./Routers/DepartmentRouter.js";
 import UserRouter from "./Routers/UserRouter.js";
+import DashboardRouter from "./Routers/DashboradRouter.js";
 
 const router = Router();
 
@@ -30,5 +31,6 @@ router.use("/api", InsuranceRouter);
 router.use("/api", PositionRouter);
 router.use("/api", DepartmentRouter);
 router.use("/api", UserRouter);
+router.use("/api", DashboardRouter);
 
 export default router;

@@ -37,6 +37,7 @@ const userSchema = new Schema(
     assignVehicle: {
       type: String,
     },
+ 
     profileimage: {
       type: String,
     },

@@ -22,9 +22,14 @@ const userSchema = new Schema(
     phone: {
       type: String,
     },
-    role: {
-      type: String,
+    driverStatus: {
+      type: Boolean,
     },
+    role: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Roles"
+    },
+
     passwordResetToken: String,
     passwordResetExpires: Date,
   },
