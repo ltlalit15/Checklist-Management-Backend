@@ -105,7 +105,7 @@ export const getVehicles = async (req, res) => {
         select: 'companyName'
       })
       .populate({
-        path: 'brachCode',
+        path: 'branchCode',
         select: 'branchCode'
       });
 

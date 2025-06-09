@@ -2,13 +2,17 @@ import Schema from "../Models/RouteModels.js"
 import asyncHandler from 'express-async-handler';
 
 export const getAllRoute = asyncHandler(async (req, res) => {
-    try {
-        const data = await Schema.find()
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(404).json(error.message);
-    }
+  try {
+    const data = await Schema.find()
+      .populate("branchCode", "branchCode") 
+      .populate("economicNumber", "economicNumber");
+
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
 });
+
 
 export const addRoute = asyncHandler(async (req, res) => {
     try {

@@ -7,11 +7,13 @@ const routeSchema = new Schema(
     routeNumber: {
       type: String,
     },
-    branchCode: {
-      type: String,
+   branchCode: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
     },
     economicNumber: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Vehicle",
     },
     username: {
       type: String,
