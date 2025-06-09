@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
 import http from 'http';
 import { Server } from 'socket.io';
 import bodyParser from "body-parser";
@@ -11,7 +13,6 @@ import { dbConnect } from "./Config/dbConnect.js";
 import routes from "./app.js";
 import { handleSocketConnection } from './Utills/SocketHelper.js';
 
-dotenv.config();
 const PORT = process.env.PORT || 6000;
 
 const app = express();
