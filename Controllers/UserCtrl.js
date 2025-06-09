@@ -108,7 +108,7 @@ export const getProfile = asyncHandler(async (req, res) => {
 
     if (userObj.role) {
       userObj.roleId = userObj.role._id;
-      userObj.role = userObj.role.roleName;
+      userObj.roleName = userObj.role.roleName;
       delete userObj.role; // remove nested role object
     }
 
