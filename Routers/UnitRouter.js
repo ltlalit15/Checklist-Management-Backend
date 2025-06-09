@@ -7,8 +7,8 @@ import { authMiddleware } from "../Middewares/authMiddleware.js";
 const router = express.Router();
 
 router.get("/unit",  authMiddleware, getAllUnits);
-router.get("/getallbranchcode",  authMiddleware, getallbranchcode);
-router.get("/geteconomicnumber",  authMiddleware, geteconomicnumber);
+router.get("/getallbranchcode", getallbranchcode);
+router.get("/geteconomicnumber", geteconomicnumber);
 router.post(
   "/unit",
   authMiddleware,

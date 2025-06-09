@@ -1,6 +1,6 @@
 import Schema from "../Models/UnitModel.js"
 import Branch from "../Models/BranchModel.js"
-import Vehicle from "../Models/BranchModel.js"
+import Vehicle from "../Models/VehicleModel.js"
 import asyncHandler from 'express-async-handler';
 
 export const getAllUnits = asyncHandler(async (req, res) => {
@@ -31,8 +31,8 @@ export const geteconomicnumber = asyncHandler(async (req, res) => {
 
   try {
     const data = await Vehicle.find({ branchCode })
-      .select("unitNumber")
-      .sort({ unitNumber: 1 });
+      .select("economicNumber")
+      .sort({ economicNumber: 1 });
 
     res.status(200).json(data);
   } catch (error) {

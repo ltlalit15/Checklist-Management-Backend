@@ -26,7 +26,7 @@ const VehicleSchema = new mongoose.Schema({
     vehicleCard: {
         type: String,
     },
-    brachCode: {
+    branchCode: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branch',
     }
