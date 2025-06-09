@@ -10,7 +10,7 @@ export const createVehicleType = async (req, res) => {
 
     const existingVehicleType = await VehicleType.findOne({ vehicleType });
     if (existingVehicleType) {
-      return res.status(400).json({ message: "Vehicle type already exists" });
+      return res.status(409).json({ message: "Vehicle type already exists" });
     }
 
     const newVehicleType = new VehicleType({
