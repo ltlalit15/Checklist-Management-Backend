@@ -92,19 +92,27 @@ export const getProfile = asyncHandler(async (req, res) => {
   }
 
   try {
-    const user = await Schema.findById(id).select("-password");
+    const user = await Schema.findById(id).select("-password").populate('role', 'roleName');
 
     if (!user) {
       return res.status(404).json({ message: "User not found", success: false });
     }
 
     const driver = await DriverSchema.findOne({ userId: id });
-
     if (driver) {
       user.driverDetails = driver;
     }
 
-    res.status(200).json({ data: user, message: "User profile fetched successfully", success: true });
+    // Transform role object
+    let userObj = user.toObject(); // convert Mongoose doc to plain JS object
+
+    if (userObj.role) {
+      userObj.roleId = userObj.role._id;
+      userObj.role = userObj.role.roleName;
+      delete userObj.role; // remove nested role object
+    }
+
+    res.status(200).json({ data: userObj, message: "User profile fetched successfully", success: true });
 
   } catch (error) {
     res.status(500).json({ message: error.message, success: false });
