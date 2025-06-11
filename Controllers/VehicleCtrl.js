@@ -8,7 +8,10 @@ export const createVehicle = async (req, res) => {
       vehicleType,
       vehicleDivision,
       insuranceCompany,
-      brachCode,
+      branchCode,
+      endDate,
+      startDate,
+      policyNumber
     } = req.body;
 
     const insuranceUploadUrl = req.files?.uploadInsurance
@@ -31,9 +34,12 @@ export const createVehicle = async (req, res) => {
       vehicleType,
       vehicleDivision,
       insuranceCompany,
-      brachCode,
+      branchCode,
       uploadInsurance: insuranceUploadUrl,
-      vehicleCard: vehicleCardUploadUrl
+      vehicleCard: vehicleCardUploadUrl,
+      endDate,
+      startDate,
+      policyNumber
     });
 
     await vehicle.save();
@@ -53,8 +59,11 @@ export const updateVehicle = async (req, res) => {
       vehicleDivision,
       modelName,
       plate,
-      brachCode,
+      branchCode,
       insuranceCompany,
+       endDate,
+      startDate, 
+      policyNumber
     } = req.body;
 
     const insuranceUploadUrl = req.files?.uploadInsurance
@@ -71,8 +80,13 @@ export const updateVehicle = async (req, res) => {
     vehicle.economicNumber = economicNumber || vehicle.economicNumber;
     vehicle.vehicleType = vehicleType || vehicle.vehicleType;
     vehicle.vehicleDivision = vehicleDivision || vehicle.vehicleDivision;
+
+    vehicle.endDate = endDate || vehicle.endDate;
+    vehicle.startDate = startDate || vehicle.startDate;
+    vehicle.policyNumber = policyNumber || vehicle.policyNumber;
+
     vehicle.modelName = modelName || vehicle.modelName;
-    vehicle.brachCode = brachCode || vehicle.brachCode;
+    vehicle.branchCode = branchCode || vehicle.branchCode;
     vehicle.plate = plate || vehicle.plate;
     vehicle.insuranceCompany = insuranceCompany || vehicle.insuranceCompany;
     if (insuranceUploadUrl) {

@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 
-
-//       ? req.files.uploadInsurance[0].path
 const VehicleSchema = new mongoose.Schema({
     economicNumber: {
         type: String,
@@ -29,8 +27,20 @@ const VehicleSchema = new mongoose.Schema({
     branchCode: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branch',
-    }
-
+    },
+    policyNumber: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    startDate: {
+        type: Date,
+        required: true
+    },
+    endDate: {
+        type: Date,
+        required: true
+    },
 
 }, {
     timestamps: true
