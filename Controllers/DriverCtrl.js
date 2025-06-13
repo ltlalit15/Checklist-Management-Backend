@@ -45,9 +45,9 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     role = foundUser.role;
   }
 
-  if (foundUser.driverStatus !== true) {
-    return res.status(403).json({ message: "Permission denied. User is inactive." });
-  }
+  // if (foundUser.driverStatus !== true) {
+  //   return res.status(403).json({ message: "Permission denied. User is inactive." });
+  // }
   const isPasswordMatch = await bcrypt.compare(password, foundUser.password);
   if (!isPasswordMatch) {
     return res.status(401).json({ message: "Invalid username or password" });
