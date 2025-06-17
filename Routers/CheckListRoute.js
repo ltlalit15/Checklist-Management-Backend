@@ -5,10 +5,10 @@ import { upload } from "../Middewares/uploadMiddleware.js";
 const router = express.Router();
 
 router.get("/checklist", getallchecklist);
-router.post("/checklist", authMiddleware, addchecklist);
+router.post("/createchecklist", authMiddleware, addchecklist);
 router.post("/fillchecklist", fillchecklist)
 router.get("/fillchecklist", getfillchecklist)
-;
+
 router.post(
     "/checklist/upload-answer-image",
     authMiddleware,

@@ -24,19 +24,14 @@ export const getallchecklist = asyncHandler(async (req, res) => {
 
 export const addchecklist = asyncHandler(async (req, res) => {
     try {
-        const { title, units, branches, answer_types, checkListStartTime, checkListEndTime, } = req.body;
+        const { title, driver, branches, answers, } = req.body;
 
-        // if (!title || !Array.isArray(answer_types) || answer_types.length === 0) {
-        //     return res.status(400).json({ message: 'Checklist title and at least one answer type is required.' });
-        // }
 
         const checklist = new Schema({
             title,
-            units,
+            driver,
             branches,
-            answer_types,
-            checkListStartTime,
-            checkListEndTime
+            answers,
         });
 
         const savedChecklist = await checklist.save();
