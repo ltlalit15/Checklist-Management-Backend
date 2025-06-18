@@ -23,23 +23,24 @@ export const getallchecklist = asyncHandler(async (req, res) => {
 });
 
 export const addchecklist = asyncHandler(async (req, res) => {
-    try {
-        const { title, driver, branches, answers, } = req.body;
+  try {
+    const { title, driver, branches, answers } = req.body;
+    
+    const checklistData = {
+      title,
+      driver,
+      branches,
+      answers
+    };
 
+    const checklist = new Schema(checklistData);
+    const saved = await checklist.save();
 
-        const checklist = new Schema({
-            title,
-            driver,
-            branches,
-            answers,
-        });
-
-        const savedChecklist = await checklist.save();
-        res.status(201).json(savedChecklist);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error while creating checklist.' });
-    }
+    res.status(201).json({ success: true, data: saved });
+  } catch (err) {
+    console.error("Checklist Create Error:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
 });
 
 export const updatechecklist = asyncHandler(async (req, res) => {

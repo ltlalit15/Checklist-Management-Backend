@@ -1,16 +1,30 @@
 import mongoose from 'mongoose';
 
+const { Schema, model } = mongoose;
 
-const ChecklistSchema = new mongoose.Schema(
+const OptionSchema = new Schema({
+  action: String,
+  choices: String,
+});
+
+const AnswerSchema = new Schema({
+  question: String,
+  options: [OptionSchema],
+  required: Boolean,
+  instruction: String,
+  questionType: String,
+});
+
+const ChecklistSchema = new Schema(
   {
-    title: { type: String },
-    driver: { type: String },
-    branches: { type: String },
-    answer_types: [],
+    title: String,
+    driver: [{ type: Schema.Types.ObjectId, ref: 'Driver' }],
+    branches: [{ type: Schema.Types.ObjectId, ref: 'Branch' }],
+    answers: [AnswerSchema],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.model('Checklist', ChecklistSchema);
+const Checklist = model('Checklist', ChecklistSchema);
+
+export default Checklist;
