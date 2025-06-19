@@ -76,6 +76,6 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-const User = mongoose.model("driver", userSchema);
+const User = mongoose.model("Driver", userSchema);
 
 export default User;

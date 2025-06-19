@@ -18,6 +18,7 @@ const AnswerSchema = new Schema({
 const ChecklistSchema = new Schema(
   {
     title: String,
+    created_by: { type: Schema.Types.ObjectId, ref: 'users' },
     driver: [{ type: Schema.Types.ObjectId, ref: 'Driver' }],
     branches: [{ type: Schema.Types.ObjectId, ref: 'Branch' }],
     answers: [AnswerSchema],

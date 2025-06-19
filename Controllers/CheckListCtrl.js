@@ -3,34 +3,71 @@ import FillSchema from "../Models/FillCheckListModel.js"
 import asyncHandler from 'express-async-handler';
 
 export const getallchecklist = asyncHandler(async (req, res) => {
-    try {
-        const data = await Schema.find()
-            .populate('units', 'unitNumber') // Only select required fields
-            .populate('branches', 'branchName'); // Select required fields
-        console.log("Data fetched from checklist:", data);
-        res.status(200).json({
-            data,
-            message: "checklist fetched successfully",
-            success: true,
-        });
-    } catch (error) {
-        res.status(404).json({
-            error: error.message,
-            message: "checklist not fetched",
-            success: false,
-        });
-    }
+  try {
+    const data = await Schema.find()
+      .populate('driver', 'username')
+      .populate('branches', 'branchName')
+      .populate('created_by', 'username')
+
+    const modifiedData = data.map((checklist) => ({
+      ...checklist._doc,
+      totalQuestions: checklist.answers.length,
+    }));
+
+    res.status(200).json({
+      data: modifiedData,
+      message: "Checklist fetched successfully",
+      success: true,
+    });
+  } catch (error) {
+    res.status(404).json({
+      error: error.message,
+      message: "Checklist not fetched",
+      success: false,
+    });
+  }
 });
+
+export const getchecklistbyid = asyncHandler(async (req, res) => {
+  try {
+
+    const data = await Schema.findById(req.params.id)
+      .populate('driver', 'username')
+      .populate('branches', 'branchName') 
+      .populate('created_by', 'username');
+    if (!data) {
+      return res.status(404).json({ message: "Checklist not found", success: false
+      });
+    }
+    const modifiedData = {
+      ...data._doc,
+      totalQuestions: data.answers.length,
+    };
+    res.status(200).json({
+      data: modifiedData,
+      message: "Checklist fetched successfully",
+      success: true,  
+    });
+  } catch (error) {
+    res.status(404).json({
+      error: error.message,
+      message: "Checklist not fetched",
+      success: false,
+    });
+  }
+});
+
 
 export const addchecklist = asyncHandler(async (req, res) => {
   try {
-    const { title, driver, branches, answers } = req.body;
-    
+    const { title, driver, branches, answers, created_by } = req.body;
+
     const checklistData = {
       title,
       driver,
       branches,
-      answers
+      answers,
+      created_by
     };
 
     const checklist = new Schema(checklistData);
@@ -44,117 +81,117 @@ export const addchecklist = asyncHandler(async (req, res) => {
 });
 
 export const updatechecklist = asyncHandler(async (req, res) => {
-    try {
-        const data = await Schema.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true }
-        );
-        res.status(200).json({ data, message: "checklist updated successfully", sucess: true });
-    } catch (error) {
-        res.status(404).json({ error: error.message, message: "checklist not updated", sucess: false });
-    }
+  try {
+    const data = await Schema.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.status(200).json({ data, message: "checklist updated successfully", sucess: true });
+  } catch (error) {
+    res.status(404).json({ error: error.message, message: "checklist not updated", sucess: false });
+  }
 }
 );
 
 export const deletechecklist = asyncHandler(async (req, res) => {
-    try {
-        const data = await Schema.findByIdAndDelete(req.params.id);
-        res.status(200).json({ data, message: "checklist deleted successfully", sucess: true });
-    } catch (error) {
-        res.status(404).json({ error: error.message, message: "checklist not deleted", sucess: false });
-    }
+  try {
+    const data = await Schema.findByIdAndDelete(req.params.id);
+    res.status(200).json({ data, message: "checklist deleted successfully", sucess: true });
+  } catch (error) {
+    res.status(404).json({ error: error.message, message: "checklist not deleted", sucess: false });
+  }
 });
 
 
 export const getresponse = asyncHandler(async (req, res) => {
-    try {
-        const data = await Schema.aggregate([
-            {
-                $lookup: {
-                    from: "branches",
-                    localField: "branches._id",
-                    foreignField: "_id",
-                    as: "branchDetails"
-                }
-            },
-            { $unwind: { path: "$branchDetails", preserveNullAndEmptyArrays: true } },
+  try {
+    const data = await Schema.aggregate([
+      {
+        $lookup: {
+          from: "branches",
+          localField: "branches._id",
+          foreignField: "_id",
+          as: "branchDetails"
+        }
+      },
+      { $unwind: { path: "$branchDetails", preserveNullAndEmptyArrays: true } },
 
-            {
-                $lookup: {
-                    from: "units",
-                    localField: "units._id",
-                    foreignField: "_id",
-                    as: "unitDetails"
-                }
-            },
-            { $unwind: { path: "$unitDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "units",
+          localField: "units._id",
+          foreignField: "_id",
+          as: "unitDetails"
+        }
+      },
+      { $unwind: { path: "$unitDetails", preserveNullAndEmptyArrays: true } },
 
-            {
-                $lookup: {
-                    from: "routes",
-                    localField: "routes._id",
-                    foreignField: "_id",
-                    as: "routeDetails"
-                }
-            },
-            { $unwind: { path: "$routeDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "routes",
+          localField: "routes._id",
+          foreignField: "_id",
+          as: "routeDetails"
+        }
+      },
+      { $unwind: { path: "$routeDetails", preserveNullAndEmptyArrays: true } },
 
-            {
-                $lookup: {
-                    from: "checklists",
-                    localField: "checklistId._id",
-                    foreignField: "_id",
-                    as: "checklistDetails"
-                }
-            },
-            { $unwind: { path: "$checklistDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "checklists",
+          localField: "checklistId._id",
+          foreignField: "_id",
+          as: "checklistDetails"
+        }
+      },
+      { $unwind: { path: "$checklistDetails", preserveNullAndEmptyArrays: true } },
 
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "driverId._id",
-                    foreignField: "_id",
-                    as: "driverDetails"
-                }
-            },
-            { $unwind: { path: "$driverDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "driverId._id",
+          foreignField: "_id",
+          as: "driverDetails"
+        }
+      },
+      { $unwind: { path: "$driverDetails", preserveNullAndEmptyArrays: true } },
 
-            {
-                $project: {
-                    checklistTitle: "$checklistDetails.title",
-                    driverName: { $concat: ["$driverDetails.firstname", " ", "$driverDetails.lastname"] },
-                    branchCode: "$branchDetails.branchCode",
-                    unitNumber: "$unitDetails.unitNumber",
-                    routeNumber: "$routeDetails.routeNumber",
-                    answers: 1,
-                    createdAt: 1
-                }
-            }
-        ]);
+      {
+        $project: {
+          checklistTitle: "$checklistDetails.title",
+          driverName: { $concat: ["$driverDetails.firstname", " ", "$driverDetails.lastname"] },
+          branchCode: "$branchDetails.branchCode",
+          unitNumber: "$unitDetails.unitNumber",
+          routeNumber: "$routeDetails.routeNumber",
+          answers: 1,
+          createdAt: 1
+        }
+      }
+    ]);
 
-        res.status(200).json({ success: true, data });
-    } catch (err) {
-        console.error("Error in aggregation:", err);
-        res.status(500).json({ success: false, message: "Server Error", error: err.message });
-    }
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    console.error("Error in aggregation:", err);
+    res.status(500).json({ success: false, message: "Server Error", error: err.message });
+  }
 
 }
 );
 
 export const fillchecklist = asyncHandler(async (req, res) => {
-    try {
-        const { checklistId, answers } = req.body;
-        if (!checklistId || !Array.isArray(answers) || answers.length === 0) {
-            return res.status(400).json({ message: 'Checklist ID and at least one answer is required.' });
-        }
-        const checkList = await FillSchema.create(req.body);
-        res.status(201).json({ message: 'Checklist filled successfully.', checkList });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error while creating checklist.' });
+  try {
+    const { checklistId, answers } = req.body;
+    if (!checklistId || !Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({ message: 'Checklist ID and at least one answer is required.' });
     }
+    const checkList = await FillSchema.create(req.body);
+    res.status(201).json({ message: 'Checklist filled successfully.', checkList });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error while creating checklist.' });
+  }
 });
 
 
