@@ -179,19 +179,37 @@ export const getresponse = asyncHandler(async (req, res) => {
 
 export const fillchecklist = asyncHandler(async (req, res) => {
   try {
-    const { checklistId, answers } = req.body;
-    if (!checklistId || !Array.isArray(answers) || answers.length === 0) {
-      return res.status(400).json({ message: 'Checklist ID and at least one answer is required.' });
+    const { checklistId, driverId, answers} = req.body;
+
+    // Basic validation
+    if (!checklistId || !driverId || !Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({
+        message: "Checklist ID, Driver ID, and answers are required",
+        success: false,
+      });
     }
-    const checkList = await FillSchema.create(req.body);
-    res.status(201).json({ message: 'Checklist filled successfully.', checkList });
+
+    // Create new fill entry
+    const filledChecklist = await FillChecklist.create({
+      checklistId,
+      driverId,
+      answers,
+    });
+
+    res.status(201).json({
+      data: filledChecklist,
+      message: "Checklist filled successfully",
+      success: true,
+    });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error while creating checklist.' });
+    res.status(500).json({
+      error: error.message,
+      message: "Failed to fill checklist",
+      success: false,
+    });
   }
 });
-
 
 export const getfillchecklist = async (req, res) => {
   try {
