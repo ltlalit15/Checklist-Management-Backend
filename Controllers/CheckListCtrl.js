@@ -190,7 +190,7 @@ export const fillchecklist = asyncHandler(async (req, res) => {
     }
 
     // Create new fill entry
-    const filledChecklist = await FillChecklist.create({
+    const filledChecklist = await FillSchema.create({
       checklistId,
       driverId,
       answers,
@@ -213,64 +213,30 @@ export const fillchecklist = asyncHandler(async (req, res) => {
 
 export const getfillchecklist = async (req, res) => {
   try {
-    const allFilledAnswers = await FillSchema.find();
+    const { driverId, checklistId } = req.query;
 
-    // For each filled answer document, fetch original checklist and compare answers
-    const results = await Promise.all(
-      allFilledAnswers.map(async (filled) => {
-        // Fetch checklist for this filled answer
-        const checklist = await Schema.findById(filled.checklistId);
-        if (!checklist) {
-          return {
-            filledId: filled._id,
-            message: 'Checklist not found for this filled answer',
-            data: filled,
-          };
-        }
+    // Build dynamic filter
+    const filter = {};
+    if (driverId) filter.driverId = driverId;
+    if (checklistId) filter.checklistId = checklistId;
 
-        // Map answers with correctness check
-        const answersWithStatus = filled.answers.map((ans) => {
-          const question = checklist.answer_types.find(
-            (q) => q._id?.toString() === ans.questionId?.toString()
-          );
-          if (!question) {
-            return {
-              questionId: ans.questionId,
-              selectedOptionIndex: ans.selectedOptionIndex,
-              isCorrect: false,
-              message: 'Question not found in checklist',
-            };
-          }
+    const data = await FillSchema.find(filter)
+      .populate("checklistId", "title") // checklist title
+      .populate("driverId", "username") // driver name
+      .populate("answers.questionId", "questionText") // question text
+      .populate("answers.answerId", "text icon") // answer info
 
-          const isCorrect = question.corrcetAnswer === ans.selectedOptionIndex?.toString();
-
-          return {
-            questionId: ans.questionId,
-            questionText: question.question_text,
-            selectedOptionIndex: ans.selectedOptionIndex,
-            correctAnswerIndex: question.corrcetAnswer,
-            isCorrect,
-          };
-        });
-
-        return {
-          filledId: filled._id,
-          checklistId: filled.checklistId,
-          submittedAt: filled.submittedAt,
-          answers: answersWithStatus,
-        };
-      })
-    );
-
-    res.json({
-      message: 'All filled checklists fetched with correctness',
-      data: results,
+    res.status(200).json({
+      success: true,
+      message: "Filled checklist fetched successfully",
+      data,
     });
   } catch (error) {
     res.status(500).json({
-      error: error.message,
-      message: 'Failed to fetch filled checklists',
       success: false,
+      message: "Failed to fetch filled checklist",
+      error: error.message,
     });
   }
 };
+
