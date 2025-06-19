@@ -57,7 +57,6 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
   }
 });
 
-
 export const addchecklist = asyncHandler(async (req, res) => {
   try {
     const { title, driver, branches, answers, created_by } = req.body;
@@ -102,7 +101,6 @@ export const deletechecklist = asyncHandler(async (req, res) => {
     res.status(404).json({ error: error.message, message: "checklist not deleted", sucess: false });
   }
 });
-
 
 export const getresponse = asyncHandler(async (req, res) => {
   try {
