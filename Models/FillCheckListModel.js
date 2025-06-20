@@ -4,18 +4,15 @@ const { Schema, model } = mongoose;
 
 const AnswerSchema = new Schema({
   questionId: {
-    type: Schema.Types.ObjectId,
-    ref: "ChecklistQuestion", // Ref to question collection
+    type: String,
     required: true,
   },
   answerId: {
-    type: Schema.Types.ObjectId,
-    ref: "AnswerOption", // Ref to answer option collection
+    type: String,
     required: true,
   },
   comment: {
     type: String,
-    required: true,
   },
 });
 
