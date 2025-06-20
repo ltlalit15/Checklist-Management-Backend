@@ -28,6 +28,41 @@ export const getallchecklist = asyncHandler(async (req, res) => {
   }
 });
 
+export const getchecklistByDriverid = asyncHandler(async (req, res) => {
+  try {
+    const { driverId } = req.query;
+
+    // Base query
+    let query = {};
+
+    // If driverId is passed, filter checklists that include this driver
+    if (driverId) {
+      query.driver = driverId;
+    }
+
+    const data = await Schema.find(query)
+      .populate('driver', 'username')
+      .populate('branches', 'branchName')
+      .populate('created_by', 'username');
+
+    const modifiedData = data.map((checklist) => ({
+      ...checklist._doc,
+      totalQuestions: checklist.answers.length,
+    }));
+
+    res.status(200).json({
+      data: modifiedData,
+      message: "Checklist fetched successfully",
+      success: true,
+    });
+  } catch (error) {
+    res.status(404).json({
+      error: error.message,
+      message: "Checklist not fetched",
+      success: false,
+    });
+  }
+});
 export const getchecklistbyid = asyncHandler(async (req, res) => {
   try {
 
