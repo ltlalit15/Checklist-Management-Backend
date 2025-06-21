@@ -1,6 +1,7 @@
 import Schema from "../Models/CheckListModel.js"
 import FillSchema from "../Models/FillCheckListModel.js"
 import asyncHandler from 'express-async-handler';
+import { getquestionsbyId, getanswerssbyId } from '../Utills/Helpers.js';
 
 export const getallchecklist = asyncHandler(async (req, res) => {
   try {
@@ -68,10 +69,11 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
 
     const data = await Schema.findById(req.params.id)
       .populate('driver', 'username')
-      .populate('branches', 'branchName') 
+      .populate('branches', 'branchName')
       .populate('created_by', 'username');
     if (!data) {
-      return res.status(404).json({ message: "Checklist not found", success: false
+      return res.status(404).json({
+        message: "Checklist not found", success: false
       });
     }
     const modifiedData = {
@@ -81,7 +83,7 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
     res.status(200).json({
       data: modifiedData,
       message: "Checklist fetched successfully",
-      success: true,  
+      success: true,
     });
   } catch (error) {
     res.status(404).json({
@@ -214,10 +216,10 @@ export const getresponse = asyncHandler(async (req, res) => {
 
 export const fillchecklist = asyncHandler(async (req, res) => {
   try {
-    const { checklistId, driverId, answers} = req.body;
+    const { checklistId, driverId, answers, signature } = req.body;
 
     // Basic validation
-    if (!checklistId || !driverId || !Array.isArray(answers) || answers.length === 0) {
+    if (!checklistId || !signature || !driverId || !Array.isArray(answers) || answers.length === 0) {
       return res.status(400).json({
         message: "Checklist ID, Driver ID, and answers are required",
         success: false,
@@ -229,6 +231,7 @@ export const fillchecklist = asyncHandler(async (req, res) => {
       checklistId,
       driverId,
       answers,
+      signature
     });
 
     res.status(201).json({
@@ -246,32 +249,70 @@ export const fillchecklist = asyncHandler(async (req, res) => {
   }
 });
 
+
 export const getfillchecklist = async (req, res) => {
   try {
     const { driverId, checklistId } = req.query;
 
-    // Build dynamic filter
     const filter = {};
     if (driverId) filter.driverId = driverId;
     if (checklistId) filter.checklistId = checklistId;
 
     const data = await FillSchema.find(filter)
-      .populate("checklistId", "title") // checklist title
-      .populate("driverId", "username") // driver name
-      .populate("answers.questionId", "questionText") // question text
-      .populate("answers.answerId", "text icon") // answer info
+      .populate("checklistId", "title answers") // only required fields
+      .populate("driverId", "username");
 
-    res.status(200).json({
+    const formatted = data.map((entry) => {
+      const checklist = entry.checklistId;
+      const filledAnswers = entry.answers;
+
+      const structuredAnswers = filledAnswers.map((filled) => {
+        const question = checklist.answers.find(
+          (q) => q._id.toString() === filled.questionId.toString()
+        );
+
+        const selectedOption = question?.options.find(
+          (opt) => opt._id.toString() === filled.answerId.toString()
+        );
+
+        return {
+          question: question?.question || "Question not found",
+          type: question?.questionType || "N/A",
+          required: question?.required || false,
+          selectedAnswer: {
+            choice: selectedOption?.choices || "Option not found",
+            action: selectedOption?.action || "N/A",
+          },
+          comment: filled.comment || "",
+        };
+      });
+
+      return {
+        fillId: entry._id,
+        checklistTitle: checklist.title,
+        driver: entry.driverId?.username || "Unknown",
+        answers: structuredAnswers,
+        singnature: entry.signature,
+        createdAt: entry.createdAt,
+      };
+    });
+
+    return res.status(200).json({
       success: true,
-      message: "Filled checklist fetched successfully",
-      data,
+      message: "Filtered filled checklist fetched successfully",
+      data: formatted,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error in getfillchecklist:", error.message);
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch filled checklist",
       error: error.message,
     });
   }
 };
+
+
+
+
 

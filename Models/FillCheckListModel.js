@@ -28,6 +28,10 @@ const FillChecklistSchema = new Schema(
       ref: "Driver",
       required: true,
     },
+    signature: {
+      type: String,
+      required: true,
+    },
     answers: [AnswerSchema],
   },
   {
