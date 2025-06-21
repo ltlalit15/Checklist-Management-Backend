@@ -225,7 +225,13 @@ export const fillchecklist = asyncHandler(async (req, res) => {
         success: false,
       });
     }
-
+    const alreadyFilled = await FillSchema.findOne({ driverId, checklistId });
+    if (alreadyFilled) {
+      return res.status(400).json({
+        success: false,
+        message: "Checklist already filled by this driver",
+      });
+    }
     // Create new fill entry
     const filledChecklist = await FillSchema.create({
       checklistId,
