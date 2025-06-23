@@ -13,8 +13,9 @@ export const getAllUnits = asyncHandler(async (req, res) => {
 });
 export const getallbranchcode = asyncHandler(async (req, res) => {
   try {
-    const data = await Branch.find()
+    const data = await Vehicle.find()
       .select("branchCode")
+      .populate("branchCode", "branchCode")
       .sort({ branchCode: 1 });
 
     res.status(200).json(data);
@@ -24,7 +25,7 @@ export const getallbranchcode = asyncHandler(async (req, res) => {
 });
 export const geteconomicnumber = asyncHandler(async (req, res) => {
   const { branchCode } = req.query;
-
+console.log("branchCode", branchCode);
   if (!branchCode) {
     return res.status(400).json({ message: "branchCode is required" });
   }

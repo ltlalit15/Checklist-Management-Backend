@@ -129,12 +129,29 @@ export const getAllUser = asyncHandler(async (req, res) => {
 
 export const getAllUserData = asyncHandler(async (req, res) => {
   try {
-    const users = await Schema.find({}).select("-password");
-    res.status(200).json({ data: users, message: "Users fetched successfully", success: true });
+    // All users excluding password
+    const allUsers = await Schema.find({}).select("-password");
+
+    // All drivers with specific role (exclude password)
+    const drivers = await User.find({ role: "6858e65fefc7bf2dc8863662" }).select("-password");
+
+    // Merge both arrays
+    const mergedUsers = [...allUsers, ...drivers];
+
+    res.status(200).json({
+      success: true,
+      message: "Users and drivers fetched successfully",
+      data: mergedUsers, // 👈 merged single array
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message, success: false });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
+
+
 
 export const toogleStatus = asyncHandler(async (req, res) => {
   try {

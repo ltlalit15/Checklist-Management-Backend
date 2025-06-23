@@ -5,7 +5,8 @@ export const getAllRoute = asyncHandler(async (req, res) => {
   try {
     const data = await Schema.find()
       .populate("branchCode", "branchCode") 
-      .populate("economicNumber", "economicNumber");
+      .populate("economicNumber", "economicNumber")
+      .populate("username", "username")
 
     res.status(200).json(data);
   } catch (error) {

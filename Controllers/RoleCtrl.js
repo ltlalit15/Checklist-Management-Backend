@@ -152,6 +152,15 @@ export const createRole = asyncHandler(async (req, res) => {
                 isGet: true,
                 permission: true
             },
+               {
+                sidebarId: "683d7168bcb71900b5cb2146",
+                subSidebar: "FilledChecklist",
+                isEdit: true,
+                isDelete: true,
+                isCreate: true,
+                isGet: true,
+                permission: true
+            },
             {
                 sidebarId: "683d7168bcb71900b5cb2147",
                 subSidebar: "BranchChecklist",

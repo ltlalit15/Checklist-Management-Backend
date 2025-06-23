@@ -16,7 +16,8 @@ const routeSchema = new Schema(
       ref: "Vehicle",
     },
     username: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Driver",
     },
   },
   {
