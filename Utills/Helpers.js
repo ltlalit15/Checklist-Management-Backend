@@ -20,5 +20,6 @@ export async function getroutebybranchId(branchId = "") {
   if (!branchId) return [];
 
   const routes = await RouteModels.find({ branchCode: branchId })
+  console.log("Routes for branchssssssssssssssssssss:", routes);
   return routes || [];
 }
