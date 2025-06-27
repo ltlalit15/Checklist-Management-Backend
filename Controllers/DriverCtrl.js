@@ -2,11 +2,13 @@ import Schema from "../Models/DriverModel.js";
 import User from "../Models/UserModel.js";
 import Role from "../Models/RoleModel.js";
 import mongoose from "mongoose";
+import Branch from "../Models/BranchModel.js"
 import Permission from "../Models/PermissionModel.js";
 import asyncHandler from "express-async-handler";
 import { generateToken } from "../Config/jwtToken.js";
 import bcrypt from "bcrypt";
 import { isValidObjectId } from "../Utills/isValidObjectId.js";
+import routeModel from "../Models/RouteModels.js";
 
 export const createuser = asyncHandler(async (req, res) => {
   try {
@@ -142,6 +144,43 @@ export const getAllUserData = asyncHandler(async (req, res) => {
       success: true,
       message: "Users and drivers fetched successfully",
       data: mergedUsers, // 👈 merged single array
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+export const getdriverByBranch = asyncHandler(async (req, res) => {
+  try {
+    const { branchIds } = req.body; // Expecting: { branchIds: ["id1", "id2", ...] }
+
+    if (!branchIds || !Array.isArray(branchIds)) {
+      return res.status(400).json({
+        success: false,
+        message: "branchIds must be an array",
+      });
+    }
+
+    // Step 1: Find routes where branchCode is in the provided branchIds
+    const routes = await routeModel.find({ branchCode: { $in: branchIds } });
+
+    // Step 2: Extract driver IDs
+    const driverIds = routes.map(route => route.username);
+
+    // Step 3: Find drivers and users with matching _ids
+    const drivers = await Schema.find({ _id: { $in: driverIds } });
+    const users = await User.find({ _id: { $in: driverIds } });
+
+    // Merge and remove duplicates if needed
+    const mergedUsers = [...users, ...drivers];
+
+    res.status(200).json({
+      success: true,
+      count: mergedUsers.length,
+      data: mergedUsers,
     });
   } catch (error) {
     res.status(500).json({

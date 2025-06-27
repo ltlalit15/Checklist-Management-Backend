@@ -43,7 +43,7 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      default: "6858e301baa5e7d79b8767c8",
+      default: "6858e65fefc7bf2dc8863662",
     },
     passwordResetToken: String,
     passwordResetExpires: Date,

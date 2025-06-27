@@ -6,7 +6,7 @@ import { uploadData } from "../Utills/Upload.js"
 const router = express.Router();
 
 router.get("/checklist", getallchecklist);
-router.get("/checklist", getchecklistByDriverid);
+router.get("/getchecklistByDriverid", getchecklistByDriverid);
 router.get("/getchecklistbyid/:id", getchecklistbyid);
 router.post("/createchecklist", addchecklist);
 router.post("/fillchecklist", fillchecklist)

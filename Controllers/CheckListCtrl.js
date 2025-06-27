@@ -40,7 +40,7 @@ export const getchecklistByDriverid = asyncHandler(async (req, res) => {
     if (driverId) {
       query.driver = driverId;
     }
-
+    console.log(query, "query");
     const data = await Schema.find(query)
       .populate('driver', 'username')
       .populate('branches', 'branchName')
