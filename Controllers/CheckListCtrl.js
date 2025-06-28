@@ -216,10 +216,10 @@ export const getresponse = asyncHandler(async (req, res) => {
 
 export const fillchecklist = asyncHandler(async (req, res) => {
   try {
-    const { checklistId, driverId, answers, signature } = req.body;
+    const { checklistId, driverId, answers, signature, BranchId } = req.body;
 
     // Basic validation
-    if (!checklistId || !signature || !driverId || !Array.isArray(answers) || answers.length === 0) {
+    if (!checklistId || !signature || !driverId || !BranchId || !Array.isArray(answers) || answers.length === 0) {
       return res.status(400).json({
         message: "Checklist ID, Driver ID, and answers are required",
         success: false,
@@ -237,7 +237,8 @@ export const fillchecklist = asyncHandler(async (req, res) => {
       checklistId,
       driverId,
       answers,
-      signature
+      signature,
+      BranchId
     });
 
     res.status(201).json({
@@ -266,7 +267,8 @@ export const getfillchecklist = async (req, res) => {
 
     const data = await FillSchema.find(filter)
       .populate("checklistId", "title answers") // only required fields
-      .populate("driverId", "username");
+      .populate("driverId", "username")
+      .populate("BranchId", "_id")
 
     const formatted = data.map((entry) => {
       const checklist = entry.checklistId;

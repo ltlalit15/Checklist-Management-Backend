@@ -6,6 +6,7 @@ import asyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import routeModel from "../Models/RouteModels.js";
 import vehicleModel from "../Models/VehicleModel.js";
+import BranchModel from "../Models/BranchModel.js";
 // export const checkListPerBranch = asyncHandler(async (req, res) => {
 //     try {
 //         const { branchId } = req.query;
@@ -62,101 +63,147 @@ import vehicleModel from "../Models/VehicleModel.js";
 //         res.status(500).json({ message: error.message });
 //     }
 // });
+//------------------------------------------------------------------------------------------------------------------------------
+const calculateChecklistPerBranch = async (branchId) => {
+  const branchObjectId = new mongoose.Types.ObjectId(branchId);
 
+  const checklist = await CheckListModel.find({ branches: branchObjectId });
+  if (!checklist || checklist.length === 0) {
+    return null;
+  }
 
-export const checkListPerBranch = asyncHandler(async (req, res) => {
-    try {
-        const { branchId } = req.query;
+  let checklistDriverMap = [];
 
-        // ✅ Helper function for calculating data for one branch
-        const calculateBranchData = async (branchId) => {
-            const branchObjectId = new mongoose.Types.ObjectId(branchId);
+  for (const checklistItem of checklist) {
+    const checklistId = checklistItem._id.toString();
+    const drivers = checklistItem.driver || [];
 
-            const checklist = await CheckListModel.find({ branches: branchObjectId });
-
-            if (!checklist || checklist.length === 0) {
-                return null;
-            }
-
-            const checklistIds = checklist.map((item) => item._id.toString());
-
-            const filledChecklists = await filledCheckListModel.find({
-                checklistId: { $in: checklistIds },
-            });
-
-            const filledChecklistIds = filledChecklists.map((f) =>
-                f.checklistId.toString()
-            );
-
-            const unfilledChecklistIds = checklistIds.filter(
-                (id) => !filledChecklistIds.includes(id)
-            );
-
-            const total = checklist.length;
-            const filled = checklistIds.length - unfilledChecklistIds.length;
-            const unfilled = unfilledChecklistIds.length;
-
-            const filledPercentage = ((filled / total) * 100).toFixed(2);
-            const unfilledPercentage = ((unfilled / total) * 100).toFixed(2);
-
-            const routes = await getroutebybranchId(branchId);
-
-            return {
-                BranchId: branchId,
-                TotalChecklist: total,
-                FilledChecklist: filled,
-                UnfilledChecklist: unfilled,
-                filledChecklistIds,
-                FilledChecklistPercentage: `${filledPercentage}%`,
-                UnfilledChecklistPercentage: `${unfilledPercentage}%`,
-                Routes: routes,
-            };
-        };
-
-        if (branchId) {
-            const result = await calculateBranchData(branchId);
-            if (!result) {
-                return res.status(404).json({ message: "No checklist found for this branch." });
-            }
-            return res.status(200).json(result);
-        } else {
-            // ✅ All distinct branches from checklist model
-            const allChecklists = await CheckListModel.find({});
-            const allBranchIds = [
-                ...new Set(allChecklists.flatMap(item => item.branches.map(b => b.toString())))
-            ];
-
-            const results = [];
-
-            for (const id of allBranchIds) {
-                const branchData = await calculateBranchData(id);
-                if (branchData) results.push(branchData);
-            }
-
-            return res.status(200).json(results);
-        }
-
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    for (const driverId of drivers) {
+      checklistDriverMap.push({
+        checklistId,
+        driverId: driverId.toString(),
+      });
     }
-});
+  }
 
-export const FilledChecklistByIds = asyncHandler(async (req, res) => {
+  const total = checklistDriverMap.length;
+
+  const filledChecklists = await filledCheckListModel.find({
+    $or: checklistDriverMap.map((item) => ({
+      checklistId: item.checklistId,
+      driverId: item.driverId,
+      driverId: item.driverId
+    })),
+  });
+
+  const filledChecklistMap = new Set(
+    filledChecklists.map(
+      (fc) => `${fc.checklistId.toString()}_${fc.driverId.toString()}`
+    )
+  );
+
+  let filled = 0;
+  let unfilled = 0;
+
+  for (const item of checklistDriverMap) {
+    const key = `${item.checklistId}_${item.driverId}`;
+    if (filledChecklistMap.has(key)) {
+      filled++;
+    } else {
+      unfilled++;
+    }
+  }
+
+  const filledPercentage = total
+    ? ((filled / total) * 100).toFixed(2)
+    : "0.00";
+
+  const pendingPercentage = total
+    ? ((unfilled / total) * 100).toFixed(2)
+    : "0.00";
+
+  const branchData = await BranchModel.findById(branchId);
+  const branchName = branchData?.branchName || "Unknown";
+
+  const latestFilled = filledChecklists
+    .map(fc => fc.createdAt)
+    .sort((a, b) => b - a)[0]; // latest date
+
+  const latestDate = latestFilled
+    ? new Date(latestFilled).toLocaleDateString("en-GB") // dd/mm/yyyy
+    : "N/A";
+  return {
+    BranchId: branchId,
+    BranchName: branchName,
+    TotalChecklist: total,
+    FilledChecklist: filled,
+    UnfilledChecklist: unfilled,
+    CompliancePercentage: `${filledPercentage}%`,
+    PendingPercentage: `${pendingPercentage}%`,
+    LatestFilledDate: latestDate, 
+
+
+  };
+};
+
+
+export const getChecklistPerBranchReport = asyncHandler(async (req, res) => {
   try {
-    const { filledChecklistIds } = req.body;
+    const { branchId } = req.query;
 
-    if (!filledChecklistIds || !Array.isArray(filledChecklistIds) || filledChecklistIds.length === 0) {
-      return res.status(400).json({ message: "Checklist IDs are required and should be an array." });
+    if (branchId) {
+      const result = await calculateChecklistPerBranch(branchId);
+      if (!result) {
+        return res.status(404).json({ message: "No checklist found for this branch." });
+      }
+      return res.status(200).json(result);
+    } else {
+      const allChecklists = await CheckListModel.find({});
+      const allBranchIds = [
+        ...new Set(allChecklists.flatMap(item => item.branches.map(b => b.toString())))
+      ];
+
+      const results = [];
+
+      for (const id of allBranchIds) {
+        const branchData = await calculateChecklistPerBranch(id);
+        if (branchData) results.push(branchData);
+      }
+
+      return res.status(200).json(results);
     }
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+//---------------------------------------------------------------------------------------------------------------------------------
+
+
+export const FilledChecklistByBranchId = asyncHandler(async (req, res) => {
+  try {
+    const { branchId } = req.body;
+
+    if (!branchId) {
+      return res.status(400).json({ message: "branchId is required" });
+    }
+
+    // ✅ Step 1: Get all checklists assigned to this branch
+    const checklistDocs = await CheckListModel.find({ branches: branchId });
+    const checklistIds = checklistDocs.map(cl => cl._id.toString());
+
+    if (checklistIds.length === 0) {
+      return res.status(200).json([]); // No checklist assigned to this branch
+    }
+
+    // ✅ Step 2: Get all filled checklists where checklistId is in those checklistIds
     const filledChecklists = await filledCheckListModel.find({
-      checklistId: { $in: filledChecklistIds },
+      checklistId: { $in: checklistIds }
     });
 
-    const checklistIds = [...new Set(filledChecklists.map(fc => fc.checklistId.toString()))];
     const driverIds = [...new Set(filledChecklists.map(fc => fc.driverId.toString()))];
 
-    const checklists = await CheckListModel.find({ _id: { $in: checklistIds } });
+    // ✅ Step 3: Get Routes for Drivers
     const routes = await routeModel.find({ username: { $in: driverIds } });
 
     const economicVehicleIds = [...new Set(routes.map(r => r.economicNumber?.toString()).filter(Boolean))];
@@ -175,12 +222,12 @@ export const FilledChecklistByIds = asyncHandler(async (req, res) => {
       };
     });
 
-    // Checklist Question & Option Mapping
+    // ✅ Step 4: Create Maps for Questions and Answers
     const checklistMap = {};
     const questionTextMap = {};
     const choiceTextMap = {};
 
-    checklists.forEach(cl => {
+    checklistDocs.forEach(cl => {
       const optionsMap = {};
       cl.answers.forEach(q => {
         questionTextMap[q._id.toString()] = q.question;

@@ -1,10 +1,9 @@
-// routes/reportRoutes.js
 import express from "express";
-import { checkListPerBranch , FilledChecklistByIds} from "../Controllers/ReportCtrl.js";
+import { getChecklistPerBranchReport, FilledChecklistByBranchId } from "../Controllers/ReportCtrl.js";
 
 const router = express.Router();
 
-router.get("/checklistperbranch", checkListPerBranch);
-router.post("/FilledChecklistByIds", FilledChecklistByIds);
+router.get("/checklistperbranch", getChecklistPerBranchReport);
+router.post("/FilledChecklistByBranchId", FilledChecklistByBranchId);
 
 export default router;

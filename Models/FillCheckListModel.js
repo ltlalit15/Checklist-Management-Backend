@@ -28,6 +28,11 @@ const FillChecklistSchema = new Schema(
       ref: "Driver",
       required: true,
     },
+    BranchId: {
+      type: Schema.Types.ObjectId,
+      ref: "Branch",
+      required: true,
+    },
     signature: {
       type: String,
       required: true,
