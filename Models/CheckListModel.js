@@ -21,6 +21,11 @@ const ChecklistSchema = new Schema(
     created_by: { type: Schema.Types.ObjectId, ref: 'users' },
     driver: [{ type: Schema.Types.ObjectId, ref: 'Driver' }],
     branches: [{ type: Schema.Types.ObjectId, ref: 'Branch' }],
+    vehicle: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Vehicle", // Make sure this is your actual vehicle model name
+},
+
     answers: [AnswerSchema],
   },
   { timestamps: true }

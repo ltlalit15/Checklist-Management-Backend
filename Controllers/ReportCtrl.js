@@ -140,7 +140,7 @@ const calculateChecklistPerBranch = async (branchId) => {
     UnfilledChecklist: unfilled,
     CompliancePercentage: `${filledPercentage}%`,
     PendingPercentage: `${pendingPercentage}%`,
-    LatestFilledDate: latestDate, 
+    LatestFilledDate: latestDate,
 
 
   };
@@ -280,6 +280,142 @@ export const FilledChecklistByBranchId = asyncHandler(async (req, res) => {
   }
 });
 
+export const checklistperroute = asyncHandler(async (req, res) => {
+  try {
+    const checklistData = await CheckListModel.find().populate("driver");
 
+    const formattedData = checklistData.map((item, index) => {
+      let redFlagCount = 0;
+      let orangeFlagCount = 0;
+
+      item.answers?.forEach(answer => {
+        answer.options?.forEach(option => {
+          if (option.flag === 'red') redFlagCount++;
+          if (option.flag === 'orange') orangeFlagCount++;
+        });
+      });
+
+      return {
+        id: index + 1,
+        date: new Date(item.createdAt).toLocaleDateString("en-GB"), // dd/mm/yy
+        route: item.driver?.[0]?.firstname || "N/A", // Or use item.driver[0]?.route if available
+        economicNumber: item.driver?.[0]?.assignVehicle || "N/A",
+        totalReportingTime: "HH:mm", // Add logic if available
+        redFlagItems: redFlagCount,
+        orangeFlagItems: orangeFlagCount,
+      };
+    });
+
+    res.status(200).json(formattedData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/////////CHECKLISTS ANSWER REPORT UNIT
+const calculateChecklistPerBranchanswerReport = async (branchId) => {
+  const branchObjectId = new mongoose.Types.ObjectId(branchId);
+
+  const checklist = await CheckListModel.find({ branches: branchObjectId });
+  if (!checklist || checklist.length === 0) {
+    return null;
+  }
+
+  let checklistDriverMap = [];
+
+  for (const checklistItem of checklist) {
+    const checklistId = checklistItem._id.toString();
+    const drivers = checklistItem.driver || [];
+
+    for (const driverId of drivers) {
+      checklistDriverMap.push({
+        checklistId,
+        driverId: driverId.toString(),
+      });
+    }
+  }
+
+  const total = checklistDriverMap.length;
+
+  const filledChecklists = await filledCheckListModel.find({
+    $or: checklistDriverMap.map((item) => ({
+      checklistId: item.checklistId,
+      driverId: item.driverId,
+      driverId: item.driverId
+    })),
+  });
+
+  const filledChecklistMap = new Set(
+    filledChecklists.map(
+      (fc) => `${fc.checklistId.toString()}_${fc.driverId.toString()}`
+    )
+  );
+
+  let filled = 0;
+  let unfilled = 0;
+
+  for (const item of checklistDriverMap) {
+    const key = `${item.checklistId}_${item.driverId}`;
+    if (filledChecklistMap.has(key)) {
+      filled++;
+    } else {
+      unfilled++;
+    }
+  }
+
+  const filledPercentage = total
+    ? ((filled / total) * 100).toFixed(2)
+    : "0.00";
+
+  const pendingPercentage = total
+    ? ((unfilled / total) * 100).toFixed(2)
+    : "0.00";
+
+  const branchData = await vehicleModel.findById(branchId);
+  const branchName = branchData?.branchName || "Unknown";
+
+  const latestFilled = filledChecklists
+    .map(fc => fc.createdAt)
+    .sort((a, b) => b - a)[0]; // latest date
+
+  const latestDate = latestFilled
+    ? new Date(latestFilled).toLocaleDateString("en-GB") // dd/mm/yyyy
+    : "N/A";
+  return {
+    BranchId: branchId,
+    BranchName: branchName,
+    TotalChecklist: total,
+    FilledChecklist: filled,
+    UnfilledChecklist: unfilled,
+    CompliancePercentage: `${filledPercentage}%`,
+    PendingPercentage: `${pendingPercentage}%`,
+    LatestFilledDate: latestDate,
+
+
+  };
+};
+
+
+export const getChecklistPerBranchReportanswerReport = asyncHandler(async (req, res) => {
+  try {
+
+    const allChecklists = await CheckListModel.find({});
+    const allBranchIds = [
+      ...new Set(allChecklists.flatMap(item => item.branches.map(b => b.toString())))
+    ];
+
+    const results = [];
+
+    for (const id of allBranchIds) {
+      const branchData = await calculateChecklistPerBranchanswerReport(id);
+      if (branchData) results.push(branchData);
+    }
+
+    return res.status(200).json(results);
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 
