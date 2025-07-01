@@ -263,6 +263,7 @@ export const FilledChecklistByBranchId = asyncHandler(async (req, res) => {
         else if (action === "correct") green.push(answerObj);
       });
 
+      console.log("routeMap[driverId",routeMap[driverId]);
       return {
         sr: index + 1,
         date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "N/A",
