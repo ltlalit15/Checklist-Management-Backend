@@ -34,15 +34,20 @@ const userSchema = new Schema(
     department: {
       type: String,
     },
+    driverStatus: {
+      type: Boolean,
+      default:false
+    },
     assignVehicle: {
       type: String,
     },
- 
+
     profileimage: {
       type: String,
     },
     role: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Roles",
       default: "6858e65fefc7bf2dc8863662",
     },
     passwordResetToken: String,

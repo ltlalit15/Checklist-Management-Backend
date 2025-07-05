@@ -1,4 +1,4 @@
-import Schema from "../Models/DriverModel.js";
+import Driver from "../Models/DriverModel.js";
 import User from "../Models/UserModel.js";
 import Role from "../Models/RoleModel.js";
 import mongoose from "mongoose";
@@ -194,16 +194,26 @@ export const getdriverByBranch = asyncHandler(async (req, res) => {
 
 export const toogleStatus = asyncHandler(async (req, res) => {
   try {
-    const { id } = req.params
-    const { driverStatus } = req.body
-    const data = await User.findByIdAndUpdate(
-      id,
-      { driverStatus },
-      { new: true }
-    )
-    res.status(200).json({ message: "Status Updated Sucessfully!", success: true, data });
+    const { id } = req.params;
+    const { driverStatus } = req.body;
+
+    // Step 1: Try to update in User
+    let data = await User.findByIdAndUpdate(id, { driverStatus }, { new: true });
+
+    // Step 2: If not found in User, try in Driver
+    if (!data) {
+      data = await Driver.findByIdAndUpdate(id, { driverStatus }, { new: true });
+    }
+
+    // Step 3: If still not found, return error
+    if (!data) {
+      return res.status(404).json({ message: "User or Driver not found", success: false });
+    }
+
+    // Step 4: Return updated data
+    res.status(200).json({ message: "Status Updated Successfully!", success: true, data });
   } catch (error) {
     res.status(500).json({ message: error.message, success: false });
-
   }
-})
+});
+

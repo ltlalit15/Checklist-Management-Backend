@@ -77,7 +77,9 @@ export const getAllUser = asyncHandler(async (req, res) => {
 export const getAllUserData = asyncHandler(async (req, res) => {
   try {
     // Fetch users
-    const users = await User.find({})
+const users = await Schema.find({
+  role: { $ne: "6858e650efc7bf2dc886364a" }
+})
       .select("-password")
       .populate("role", "roleName")
       .exec();
