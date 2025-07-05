@@ -1,3 +1,4 @@
+import Schema from "../Models/DriverModel.js";
 import Driver from "../Models/DriverModel.js";
 import User from "../Models/UserModel.js";
 import Role from "../Models/RoleModel.js";
