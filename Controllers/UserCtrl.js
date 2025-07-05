@@ -76,11 +76,31 @@ export const getAllUser = asyncHandler(async (req, res) => {
 
 export const getAllUserData = asyncHandler(async (req, res) => {
   try {
-    const users = await Schema.find({}).select("-password") .populate('role', 'roleName') // populate role field but only roleName
-  .exec();;
-    res.status(200).json({ data: users, message: "Users fetched successfully", success: true });
+    // Fetch users
+    const users = await User.find({})
+      .select("-password")
+      .populate("role", "roleName")
+      .exec();
+
+    // Fetch drivers
+    const drivers = await DriverSchema.find({})
+      .select("-password")
+      .populate("role", "roleName")
+      .exec();
+
+    // Combine both
+    const allUsers = [...users, ...drivers];
+
+    res.status(200).json({
+      data: allUsers,
+      message: "Users fetched successfully",
+      success: true,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message, success: false });
+    res.status(500).json({
+      message: error.message,
+      success: false,
+    });
   }
 });
 
