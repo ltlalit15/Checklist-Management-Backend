@@ -52,7 +52,11 @@ export const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deletedUser = await Schema.findByIdAndDelete(id);
+    let deletedUser = await Schema.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      deletedUser = await DriverSchema.findByIdAndDelete(id);
+    }
 
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found", success: false });
@@ -63,6 +67,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
     res.status(500).json({ message: error.message, success: false });
   }
 });
+
 
 export const getAllUser = asyncHandler(async (req, res) => {
   try {
