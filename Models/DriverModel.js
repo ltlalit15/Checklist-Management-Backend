@@ -48,7 +48,7 @@ const userSchema = new Schema(
     role: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Roles",
-      default: "6858e65fefc7bf2dc8863662",
+      default: "686b9d3d9bd9a2274536350b",
     },
     passwordResetToken: String,
     passwordResetExpires: Date,
