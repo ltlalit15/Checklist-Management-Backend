@@ -18,7 +18,6 @@ export const createuser = asyncHandler(async (req, res) => {
   res.status(200).json({ data, message: "User created successfully", success: true });
 });
 
-
 export const editUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!isValidObjectId(id)) {
@@ -67,7 +66,6 @@ export const deleteUser = asyncHandler(async (req, res) => {
     res.status(500).json({ message: error.message, success: false });
   }
 });
-
 
 export const getAllUser = asyncHandler(async (req, res) => {
   try {
