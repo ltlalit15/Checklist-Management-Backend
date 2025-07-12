@@ -13,18 +13,20 @@ const AnswerSchema = new Schema({
   required: Boolean,
   instruction: String,
   questionType: String,
+  addComment: String
 });
 
 const ChecklistSchema = new Schema(
   {
     title: String,
     created_by: { type: Schema.Types.ObjectId, ref: 'users' },
-    driver: [{ type: Schema.Types.ObjectId, ref: 'Driver' }],
+    department: [{ type: Schema.Types.ObjectId, ref: 'Department' }],
+    position: [{ type: Schema.Types.ObjectId, ref: 'Position' }],
     branches: [{ type: Schema.Types.ObjectId, ref: 'Branch' }],
     vehicle: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "Vehicle", // Make sure this is your actual vehicle model name
-},
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Vehicle", // Make sure this is your actual vehicle model name
+    },
 
     answers: [AnswerSchema],
   },

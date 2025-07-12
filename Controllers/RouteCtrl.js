@@ -3,10 +3,17 @@ import asyncHandler from 'express-async-handler';
 
 export const getAllRoute = asyncHandler(async (req, res) => {
   try {
-    const data = await Schema.find()
-      .populate("branchCode", "branchCode") 
+    const { username } = req.query;
+
+    const filter = {};
+    if (username) {
+      filter.driver = username;
+    }
+
+    const data = await Schema.find(filter)
+      .populate("branchCode", "branchCode")
       .populate("economicNumber", "economicNumber")
-      .populate("username", "username")
+      .populate("username", "username");
 
     res.status(200).json(data);
   } catch (error) {

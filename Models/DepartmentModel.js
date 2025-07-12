@@ -16,6 +16,6 @@ const Schemas = new Schema(
   }
 );
 
-const category = mongoose.model("Departments", Schemas);
+const category = mongoose.model("Department", Schemas);
 
 export default category;

@@ -6,10 +6,10 @@ import { getquestionsbyId, getanswerssbyId } from '../Utills/Helpers.js';
 export const getallchecklist = asyncHandler(async (req, res) => {
   try {
     const data = await Schema.find()
-      .populate('driver', 'username')
-      .populate('branches', 'branchName')
+         .populate('department', 'departmentName') 
+      .populate('position', 'positionName')
+     .populate('branches', 'branchName')
       .populate('created_by', 'username')
-
     const modifiedData = data.map((checklist) => ({
       ...checklist._doc,
       totalQuestions: checklist.answers.length,
@@ -64,6 +64,7 @@ export const getchecklistByDriverid = asyncHandler(async (req, res) => {
     });
   }
 });
+
 export const getchecklistbyid = asyncHandler(async (req, res) => {
   try {
 
@@ -96,13 +97,14 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
 
 export const addchecklist = asyncHandler(async (req, res) => {
   try {
-    const { title, driver, branches, answers, created_by } = req.body;
+    const { title, driver, answers, created_by , position, department} = req.body;
 
     const checklistData = {
       title,
       driver,
-      branches,
       answers,
+      position, 
+      department,
       created_by
     };
 
@@ -133,6 +135,7 @@ export const updatechecklist = asyncHandler(async (req, res) => {
 export const deletechecklist = asyncHandler(async (req, res) => {
   try {
     const data = await Schema.findByIdAndDelete(req.params.id);
+    await FillSchema.findByIdAndDelete(req.params.id)
     res.status(200).json({ data, message: "checklist deleted successfully", sucess: true });
   } catch (error) {
     res.status(404).json({ error: error.message, message: "checklist not deleted", sucess: false });
@@ -272,10 +275,10 @@ export const getfillchecklist = async (req, res) => {
 
     const formatted = data.map((entry) => {
       const checklist = entry.checklistId;
-      const filledAnswers = entry.answers;
+      const filledAnswers = entry?.answers;
 
       const structuredAnswers = filledAnswers.map((filled) => {
-        const question = checklist.answers.find(
+        const question = checklist?.answers.find(
           (q) => q._id.toString() === filled.questionId.toString()
         );
 
@@ -297,7 +300,7 @@ export const getfillchecklist = async (req, res) => {
 
       return {
         fillId: entry._id,
-        checklistTitle: checklist.title,
+        checklistTitle: checklist?.title,
         driver: entry.driverId?.username || "Unknown",
         answers: structuredAnswers,
         singnature: entry.signature,
