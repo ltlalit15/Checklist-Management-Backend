@@ -2,23 +2,23 @@ import Schema from "../Models/RouteModels.js"
 import asyncHandler from 'express-async-handler';
 
 export const getAllRoute = asyncHandler(async (req, res) => {
-  try {
-    const { username } = req.query;
+    try {
+        const { username } = req.query;
 
-    const filter = {};
-    if (username) {
-      filter.driver = username;
+        const filter = {};
+        if (username) {
+            filter.driver = username;
+        }
+
+        const data = await Schema.find(filter)
+            .populate("branchCode", "branchCode")
+            .populate("economicNumber", "economicNumber")
+            .populate("username", "username");
+
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
-
-    const data = await Schema.find(filter)
-      .populate("branchCode", "branchCode")
-      .populate("economicNumber", "economicNumber")
-      .populate("username", "username");
-
-    res.status(200).json(data);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
 });
 
 
