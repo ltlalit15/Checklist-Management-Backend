@@ -1,24 +1,27 @@
 import Schema from "../Models/RouteModels.js"
 import asyncHandler from 'express-async-handler';
 
+import mongoose from "mongoose";
+
 export const getAllRoute = asyncHandler(async (req, res) => {
-    try {
-        const { username } = req.query;
+  try {
+    const { username } = req.query;
 
-        const filter = {};
-        if (username) {
-            filter.driver = username;
-        }
-
-        const data = await Schema.find(filter)
-            .populate("branchCode", "branchCode")
-            .populate("economicNumber", "economicNumber")
-            .populate("username", "username");
-
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(404).json({ message: error.message });
+    const filter = {};
+    if (username) {
+      // Make sure to convert the ID to ObjectId
+      filter.username = new mongoose.Types.ObjectId(username);
     }
+
+    const data = await Schema.find(filter)
+      .populate("branchCode", "branchCode")
+      .populate("economicNumber", "economicNumber")
+      .populate("username", "username");
+
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
 });
 
 
