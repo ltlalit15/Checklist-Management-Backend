@@ -69,7 +69,6 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
   try {
 
     const data = await Schema.findById(req.params.id)
-      .populate('driver', 'username')
       .populate('branches', 'branchName')
       .populate('created_by', 'username');
     if (!data) {
