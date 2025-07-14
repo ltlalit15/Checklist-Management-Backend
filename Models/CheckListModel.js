@@ -25,7 +25,7 @@ const ChecklistSchema = new Schema(
     branches: [{ type: Schema.Types.ObjectId, ref: 'Branch' }],
     vehicle: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Vehicle", // Make sure this is your actual vehicle model name
+      ref: "Vehicle", 
     },
 
     answers: [AnswerSchema],

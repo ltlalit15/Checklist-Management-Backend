@@ -96,7 +96,7 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
 
 export const addchecklist = asyncHandler(async (req, res) => {
   try {
-    const { title, driver, answers, created_by , position, department} = req.body;
+    const { title, driver, answers, created_by , position, department , branches} = req.body;
 
     const checklistData = {
       title,
@@ -104,6 +104,7 @@ export const addchecklist = asyncHandler(async (req, res) => {
       answers,
       position, 
       department,
+      branches,
       created_by
     };
 
