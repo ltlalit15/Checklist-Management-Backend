@@ -2,6 +2,7 @@ import Schema from "../Models/CheckListModel.js"
 import FillSchema from "../Models/FillCheckListModel.js"
 import asyncHandler from 'express-async-handler';
 import { getquestionsbyId, getanswerssbyId } from '../Utills/Helpers.js';
+import mongoose from 'mongoose';
 
 export const getallchecklist = asyncHandler(async (req, res) => {
   try {
@@ -70,7 +71,9 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
 
     const data = await Schema.findById(req.params.id)
       .populate('branches', 'branchName')
-      .populate('created_by', 'username');
+      .populate('created_by', 'username')
+      .populate('department', 'departmentName')
+      .populate('position', 'positionName')
     if (!data) {
       return res.status(404).json({
         message: "Checklist not found", success: false
@@ -94,18 +97,59 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
   }
 });
 
+// export const addchecklist = asyncHandler(async (req, res) => {
+//   try {
+//     const { title, driver, answers, created_by , position, department , branches} = req.body;
+
+//     const checklistData = {
+//       title,
+//       driver,
+//       answers,
+//       position, 
+//       department,
+//       branches,
+//       created_by
+//     };
+
+//     const checklist = new Schema(checklistData);
+//     const saved = await checklist.save();
+
+//     res.status(201).json({ success: true, data: saved });
+//   } catch (err) {
+//     console.error("Checklist Create Error:", err);
+//     res.status(500).json({ success: false, message: "Server Error" });
+//   }
+// });
+
 export const addchecklist = asyncHandler(async (req, res) => {
   try {
-    const { title, driver, answers, created_by , position, department , branches} = req.body;
+    const { title, driver, answers, created_by, position, department, branches } = req.body;
+
+    // Ensure default option if options array is empty
+    const processedAnswers = answers.map((ans) => {
+      if (!ans.options || ans.options.length === 0) {
+        return {
+          ...ans,
+          options: [
+            {
+              _id: new mongoose.Types.ObjectId(),
+              action: "correct",
+              choices: ""
+            }
+          ]
+        };
+      }
+      return ans;
+    });
 
     const checklistData = {
       title,
       driver,
-      answers,
-      position, 
+      created_by,
+      position,
       department,
       branches,
-      created_by
+      answers: processedAnswers
     };
 
     const checklist = new Schema(checklistData);
