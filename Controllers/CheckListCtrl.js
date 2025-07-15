@@ -7,9 +7,9 @@ import mongoose from 'mongoose';
 export const getallchecklist = asyncHandler(async (req, res) => {
   try {
     const data = await Schema.find()
-         .populate('department', 'departmentName') 
+      .populate('department', 'departmentName')
       .populate('position', 'positionName')
-     .populate('branches', 'branchName')
+      .populate('branches', 'branchName')
       .populate('created_by', 'username')
     const modifiedData = data.map((checklist) => ({
       ...checklist._doc,
@@ -306,7 +306,7 @@ export const fillchecklist = asyncHandler(async (req, res) => {
 
 export const getfillchecklist = async (req, res) => {
   try {
-    const { checklistId } = req.params; 
+    const { checklistId } = req.params;
 
     const filter = {};
     if (checklistId) filter.checklistId = checklistId;
@@ -363,6 +363,31 @@ export const getfillchecklist = async (req, res) => {
       message: "Failed to fetch filled checklist",
       error: error.message,
     });
+  }
+};
+
+export const getAllCheckListData = async (req, res) => {
+  try {
+    const response = await FillSchema.find()
+      .populate("checklistId", "title answers")
+      .populate("driverId", "username")
+      .populate("BranchId", "_id");
+
+    // Format the response
+    const formatted = response.map((item) => ({
+      _id: item._id,
+      checklistTitle: item.checklistId?.title || "",
+      driver: item.driverId?.username || "",
+      branchId: item.BranchId?._id || "",
+      signature: item.signature,
+      answers: item.answers,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    }));
+
+    return res.status(200).json(formatted);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
 
