@@ -10,7 +10,7 @@ router.get("/getchecklistByDriverid", getchecklistByDriverid);
 router.get("/getchecklistbyid/:id", getchecklistbyid);
 router.post("/createchecklist", addchecklist);
 router.post("/fillchecklist", fillchecklist)
-router.get("/fillchecklist", getfillchecklist)
+router.get("/fillchecklist/:driverId", getfillchecklist)
 
 router.post(
     "/checklist/upload-answer-image",

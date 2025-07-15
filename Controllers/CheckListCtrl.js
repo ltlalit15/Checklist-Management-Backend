@@ -306,16 +306,15 @@ export const fillchecklist = asyncHandler(async (req, res) => {
 
 export const getfillchecklist = async (req, res) => {
   try {
-    const { driverId, checklistId } = req.query;
+    const { checklistId } = req.params; 
 
     const filter = {};
-    if (driverId) filter.driverId = driverId;
     if (checklistId) filter.checklistId = checklistId;
 
     const data = await FillSchema.find(filter)
-      .populate("checklistId", "title answers") // only required fields
+      .populate("checklistId", "title answers")
       .populate("driverId", "username")
-      .populate("BranchId", "_id")
+      .populate("BranchId", "_id");
 
     const formatted = data.map((entry) => {
       const checklist = entry.checklistId;
@@ -323,11 +322,11 @@ export const getfillchecklist = async (req, res) => {
 
       const structuredAnswers = filledAnswers.map((filled) => {
         const question = checklist?.answers.find(
-          (q) => q._id.toString() === filled.questionId.toString()
+          (q) => q._id?.toString() === filled.questionId?.toString()
         );
 
-        const selectedOption = question?.options.find(
-          (opt) => opt._id.toString() === filled.answerId.toString()
+        const selectedOption = question?.options?.find(
+          (opt) => opt._id?.toString() === filled.answerId?.toString()
         );
 
         return {
@@ -344,17 +343,17 @@ export const getfillchecklist = async (req, res) => {
 
       return {
         fillId: entry._id,
-        checklistTitle: checklist?.title,
+        checklistTitle: checklist?.title || "N/A",
         driver: entry.driverId?.username || "Unknown",
         answers: structuredAnswers,
-        singnature: entry.signature,
+        signature: entry.signature,
         createdAt: entry.createdAt,
       };
     });
 
     return res.status(200).json({
       success: true,
-      message: "Filtered filled checklist fetched successfully",
+      message: "Filled checklist fetched successfully",
       data: formatted,
     });
   } catch (error) {
@@ -366,6 +365,7 @@ export const getfillchecklist = async (req, res) => {
     });
   }
 };
+
 
 
 
