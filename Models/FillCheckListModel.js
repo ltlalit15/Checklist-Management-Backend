@@ -9,7 +9,7 @@ const AnswerSchema = new Schema({
   },
   answerId: {
     type: String,
-    required: true,
+    // required: true,
   },
   comment: {
     type: String,
