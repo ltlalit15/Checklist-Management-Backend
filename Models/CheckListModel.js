@@ -9,6 +9,7 @@ const OptionSchema = new Schema({
 
 const AnswerSchema = new Schema({
   question: String,
+  image: String,
   options: [OptionSchema],
   required: Boolean,
   instruction: String,

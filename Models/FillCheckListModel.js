@@ -11,6 +11,9 @@ const AnswerSchema = new Schema({
     type: String,
     // required: true,
   },
+  answer: {
+    type: String,
+  },
   comment: {
     type: String,
   },
