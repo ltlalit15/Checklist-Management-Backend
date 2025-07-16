@@ -33,6 +33,7 @@ export const uploadToCloudinary = (buffer, filename) => {
 export const fillchecklist = asyncHandler(async (req, res) => {
   try {
     const { checklistId, driverId, signature, BranchId } = req.body;
+    console.log("req.body",req,body);
     let answers = JSON.parse(req.body.answers || "[]");
     const files = req.files || [];
     let imageIds = req.body.imageIds || [];
@@ -217,7 +218,7 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
 // });
 
 
-export const addchecklist = asyncHandler(async (req, res) => {
+export const  addchecklist = asyncHandler(async (req, res) => {
   try {
     const title = req.body.title;
     const driver = req.body.driver;
@@ -273,15 +274,12 @@ export const addchecklist = asyncHandler(async (req, res) => {
       answers: processedAnswers
     };
 
-    // ❌ Wrong: new Schema(...) ❌
-    // ✅ Correct: use Mongoose model
     const checklist = new Schema(checklistData);
     const saved = await checklist.save();
 
     res.status(201).json({ success: true, data: saved });
   } catch (err) {
-    console.error("Checklist Create Error:", err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ success: false, message: err.message, error: err });
   }
 });
 
