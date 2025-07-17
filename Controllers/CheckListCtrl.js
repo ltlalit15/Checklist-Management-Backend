@@ -304,15 +304,38 @@ export const updatechecklist = asyncHandler(async (req, res) => {
 }
 );
 
+
 export const deletechecklist = asyncHandler(async (req, res) => {
   try {
-    const data = await Schema.findByIdAndDelete(req.params.id);
-    await FillSchema.findByIdAndDelete(req.params.id)
-    res.status(200).json({ data, message: "checklist deleted successfully", sucess: true });
+    const checklistId = req.params.id;
+
+    // Delete the checklist
+    const data = await Schema.findByIdAndDelete(checklistId);
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Checklist not found",
+      });
+    }
+
+    // Delete all filled checklists linked to this checklist
+    await FillSchema.deleteMany({ checklistId });
+
+    res.status(200).json({
+      success: true,
+      message: "Checklist and all associated filled responses deleted successfully",
+      data,
+    });
   } catch (error) {
-    res.status(404).json({ error: error.message, message: "checklist not deleted", sucess: false });
+    res.status(500).json({
+      success: false,
+      message: "Checklist deletion failed",
+      error: error.message,
+    });
   }
 });
+
 
 export const deletefillchecklist = asyncHandler(async (req, res) => {
   try {
@@ -466,8 +489,8 @@ export const getAllCheckListData = async (req, res) => {
     const response = await FillSchema.find()
       .populate("checklistId", "title answers")
       .populate("driverId", "username")
-      .populate("BranchId", "branchName")
-    // .select("-signature");
+      .populate("BranchId", "branchName");
+
     const formatted = response.map((entry) => {
       const checklist = entry.checklistId;
       const filledAnswers = entry?.answers;
@@ -480,24 +503,30 @@ export const getAllCheckListData = async (req, res) => {
         const selectedOption = question?.options?.find(
           (opt) => opt._id?.toString() === filled.answerId?.toString()
         );
+
         return {
-          question: question?.question,
+          questionId: filled.questionId,
+          question: question?.question || "N/A",
           type: question?.questionType || "N/A",
           required: question?.required || false,
+          instruction: question?.instruction || "",
+          answerComment: filled?.answerComment || "",
           selectedAnswer: {
-            choice: selectedOption?.choices,
-            action: selectedOption?.action || "N/A",
+            answerId: filled?.answerId || null,
+            value: filled?.answer || "",
+            choice: selectedOption?.choices || null,
+            action: selectedOption?.action || null,
           },
-          comment: filled.comment || "",
         };
       });
+
       return {
         fillId: entry._id,
         checklistTitle: checklist?.title || "N/A",
         driver: entry.driverId?.username || "Unknown",
-        branchId: entry.BranchId?.branchName || "",
+        branch: entry.BranchId?.branchName || "",
+        signature: entry.signature || null,
         answers: structuredAnswers,
-        signature: entry.signature,
         createdAt: entry.createdAt,
         updatedAt: entry.updatedAt,
       };
@@ -516,6 +545,7 @@ export const getAllCheckListData = async (req, res) => {
     });
   }
 };
+
 
 
 
