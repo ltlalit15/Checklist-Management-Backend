@@ -1,5 +1,5 @@
 import express from "express";
-import { getallchecklist, getchecklistbyid, addchecklist, fillchecklist, getAllCheckListData, getfillchecklist, deletechecklist, updatechecklist, getresponse, getchecklistByDriverid } from "../Controllers/CheckListCtrl.js";
+import { getallchecklist, getchecklistbyid, addchecklist, fillchecklist,deletefillchecklist, getAllCheckListData, getfillchecklist, deletechecklist, updatechecklist, getresponse, getchecklistByDriverid } from "../Controllers/CheckListCtrl.js";
 import { authMiddleware } from "../Middewares/authMiddleware.js";
 import { upload } from "../Middewares/uploadChecklistimag.js";
 import {uploadData} from "../Controllers/CheckListCtrl.js"
@@ -32,6 +32,7 @@ router.post(
 
 router.put("/checklist/:id", authMiddleware, updatechecklist);
 router.delete("/checklist/:id", authMiddleware, deletechecklist);
+router.delete("/fillchecklist/:id", deletefillchecklist);
 router.get("/response", getresponse);
 
 export default router;

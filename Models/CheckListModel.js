@@ -14,7 +14,7 @@ const AnswerSchema = new Schema({
   required: Boolean,
   instruction: String,
   questionType: String,
-  addComment: String
+  comment: String
 });
 
 const ChecklistSchema = new Schema(

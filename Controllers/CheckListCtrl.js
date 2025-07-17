@@ -218,12 +218,12 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
 
 
 export const addchecklist = asyncHandler(async (req, res) => {
-    console.log("🟢 API Hit: addchecklist");
-    console.log("req.body.title =>", req.body.title);
-    console.log("req.body.answers =>", req.body.answers);
-    console.log("req.files =>", req.files);
+  console.log("🟢 API Hit: addchecklist");
+  console.log("req.body.title =>", req.body.title);
+  console.log("req.body.answers =>", req.body.answers);
+  console.log("req.files =>", req.files);
   try {
-   
+
 
     const title = req.body.title;
     const driver = req.body.driver;
@@ -258,25 +258,26 @@ export const addchecklist = asyncHandler(async (req, res) => {
 
         const options = (ans.options && ans.options.length > 0)
           ? ans.options.map(opt => ({
-              _id: opt._id || new mongoose.Types.ObjectId(),
-              action: opt.action || "correct",
-              choices: opt.choices || ""
-            }))
+            _id: opt._id || new mongoose.Types.ObjectId(),
+            action: opt.action || "correct",
+            choices: opt.choices || ""
+          }))
           : [{
-              _id: new mongoose.Types.ObjectId(),
-              action: "correct",
-              choices: ""
-            }];
-console.log("ans",ans);
+            _id: new mongoose.Types.ObjectId(),
+            action: "correct",
+            choices: ""
+          }];
+        console.log("ans", ans);
         return {
           question: ans.question || '',
           questionType: ans.questionType,
           instruction: ans.instruction || '',
           required: ans.required === true,
-          addComment: ans.addComment || "",
+          comment: ans.comment || '',                // 🟢 actual comment
           options,
           image: imageUrl
         };
+
       })
     );
 
@@ -325,6 +326,15 @@ export const deletechecklist = asyncHandler(async (req, res) => {
     const data = await Schema.findByIdAndDelete(req.params.id);
     await FillSchema.findByIdAndDelete(req.params.id)
     res.status(200).json({ data, message: "checklist deleted successfully", sucess: true });
+  } catch (error) {
+    res.status(404).json({ error: error.message, message: "checklist not deleted", sucess: false });
+  }
+});
+export const deletefillchecklist = asyncHandler(async (req, res) => {
+  try {
+    const data = await FillSchema.findByIdAndDelete(req.params.id);
+    await FillSchema.findByIdAndDelete(req.params.id)
+    res.status(200).json({ data, message: "fillchecklist deleted successfully", sucess: true });
   } catch (error) {
     res.status(404).json({ error: error.message, message: "checklist not deleted", sucess: false });
   }
