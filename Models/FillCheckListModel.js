@@ -14,7 +14,7 @@ const AnswerSchema = new Schema({
   answer: {
     type: String,
   },
-  comment: {
+  answerComment: {
     type: String,
   },
 });

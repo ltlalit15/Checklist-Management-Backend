@@ -486,7 +486,7 @@ export const getAllCheckListData = async (req, res) => {
       .populate("checklistId", "title answers")
       .populate("driverId", "username")
       .populate("BranchId", "_id")
-      .select("-signature");
+      // .select("-signature");
 
     const formatted = response.map((entry) => {
       const checklist = entry.checklistId;
