@@ -33,7 +33,6 @@ export const uploadToCloudinary = (buffer, filename) => {
 export const fillchecklist = asyncHandler(async (req, res) => {
   try {
     const { checklistId, driverId, signature, BranchId } = req.body;
-    console.log("req.body",req,body);
     let answers = JSON.parse(req.body.answers || "[]");
     const files = req.files || [];
     let imageIds = req.body.imageIds || [];
@@ -218,8 +217,14 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
 // });
 
 
-export const  addchecklist = asyncHandler(async (req, res) => {
+export const addchecklist = asyncHandler(async (req, res) => {
+    console.log("🟢 API Hit: addchecklist");
+    console.log("req.body.title =>", req.body.title);
+    console.log("req.body.answers =>", req.body.answers);
+    console.log("req.files =>", req.files);
   try {
+   
+
     const title = req.body.title;
     const driver = req.body.driver;
     const created_by = req.body.created_by;
@@ -230,39 +235,50 @@ export const  addchecklist = asyncHandler(async (req, res) => {
     const position = JSON.parse(req.body.position || "[]");
     const answers = JSON.parse(req.body.answers || "[]");
 
-    const files = req.files;
+    const files = req.files || [];
     let imageIndex = 0;
 
-    const processedAnswers = answers.map((ans) => {
-      let imageUrl = "";
+    // ✅ Use Cloudinary for Upload Image With Point
+    const processedAnswers = await Promise.all(
+      answers.map(async (ans) => {
+        let imageUrl = "";
 
-      if (
-        ans.questionType === "Upload Image With Point To Select" &&
-        files?.[imageIndex]
-      ) {
-        imageUrl = files[imageIndex].path;
-        imageIndex++;
-      }
+        if (
+          ans.questionType === "Upload Image With Point To Select" &&
+          files?.[imageIndex]
+        ) {
+          const file = files[imageIndex];
+          const uploadResult = await uploadToCloudinary(
+            file.buffer,
+            `checklist_questions/${Date.now()}_${imageIndex}`
+          );
+          imageUrl = uploadResult;
+          imageIndex++;
+        }
 
-      const options = (ans.options && ans.options.length > 0)
-        ? ans.options
-        : [{
-          _id: new mongoose.Types.ObjectId(),
-          action: "correct",
-          choices: ""
-        }];
-
-      return {
-        question: ans.question || '',
-        questionType: ans.questionType,
-        instruction: ans.instruction || '',
-        required: ans.required === true,                     // ✅ Boolean
-        addComment: ans.addComment || "",                    // ✅ String (empty or actual value)
-        options,
-        image: imageUrl
-      };
-    });
-
+        const options = (ans.options && ans.options.length > 0)
+          ? ans.options.map(opt => ({
+              _id: opt._id || new mongoose.Types.ObjectId(),
+              action: opt.action || "correct",
+              choices: opt.choices || ""
+            }))
+          : [{
+              _id: new mongoose.Types.ObjectId(),
+              action: "correct",
+              choices: ""
+            }];
+console.log("ans",ans);
+        return {
+          question: ans.question || '',
+          questionType: ans.questionType,
+          instruction: ans.instruction || '',
+          required: ans.required === true,
+          addComment: ans.addComment || "",
+          options,
+          image: imageUrl
+        };
+      })
+    );
 
     const checklistData = {
       title,
@@ -279,7 +295,12 @@ export const  addchecklist = asyncHandler(async (req, res) => {
 
     res.status(201).json({ success: true, data: saved });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message, error: err });
+    console.error("Checklist Create Error =>", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+      error: err
+    });
   }
 });
 

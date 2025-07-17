@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/checklist", getallchecklist);
 router.get("/getchecklistByDriverid", getchecklistByDriverid);
 router.get("/getchecklistbyid/:id", getchecklistbyid);
-router.post("/createchecklist", upload.array('images'), addchecklist);
+router.post("/createchecklist", uploadData.array('images'), addchecklist);
 router.post("/fillchecklist", uploadData.array("images"),fillchecklist)
 router.get("/fillchecklist/:driverId", getfillchecklist)
 router.get("/getallfillchecklist", getAllCheckListData)
