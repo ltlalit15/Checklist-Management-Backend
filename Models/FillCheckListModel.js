@@ -12,7 +12,7 @@ const AnswerSchema = new Schema({
     // required: true,
   },
   answer: {
-    type: String,
+    type: Schema.Types.Mixed,
   },
   answerComment: {
     type: String,

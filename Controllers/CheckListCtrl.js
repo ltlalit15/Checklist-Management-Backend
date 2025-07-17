@@ -37,13 +37,12 @@ export const fillchecklist = asyncHandler(async (req, res) => {
     const files = req.files || [];
     let imageIds = req.body.imageIds || [];
 
-    // Handle case where imageIds comes as single string instead of array
     if (typeof imageIds === "string") {
       imageIds = [imageIds];
     }
 
     // 🧠 Step 1: Map imageIds to uploaded files
-    const imageMap = {}; // { img1: file1, img2: file2, ... }
+    const imageMap = {}; // { img0: file1, img1: file2, ... }
     imageIds.forEach((id, index) => {
       imageMap[id] = files[index];
     });
@@ -56,25 +55,36 @@ export const fillchecklist = asyncHandler(async (req, res) => {
     answers = await Promise.all(
       answers.map(async (ans) => {
         if (ans.answer?.startsWith("__image__")) {
-          const imageKey = ans.answer.replace("__image__", ""); // get 'img1', 'img2'
-          const file = imageMap[imageKey];
+          const imageKeysString = ans.answer.replace("__image__", ""); // "img0,img1"
+          const imageKeys = imageKeysString.split(",");
 
-          if (file) {
-            const imageUrl = await uploadToCloudinary(
-              file.buffer,
-              `filled_checklist_images/${imageKey}_${Date.now()}`
-            );
-            return { ...ans, answer: imageUrl };
-          } else {
-            console.warn(`❌ No file found for image key: ${imageKey}`);
-            return { ...ans, answer: "" }; // Or handle fallback
+          const uploadedUrls = [];
+
+          for (let key of imageKeys) {
+            const file = imageMap[key];
+
+            if (file) {
+              const imageUrl = await uploadToCloudinary(
+                file.buffer,
+                `filled_checklist_images/${key}_${Date.now()}`
+              );
+              uploadedUrls.push(imageUrl);
+            } else {
+              console.warn(`❌ No file found for image key: ${key}`);
+            }
           }
+
+          return {
+            ...ans,
+            answer: uploadedUrls.length === 1 ? uploadedUrls[0] : uploadedUrls, // ✅ array if multiple
+          };
         }
+
         return ans;
       })
     );
 
-    // Step 3: Save to DB
+    // 🧠 Step 3: Save to DB
     const filledChecklist = await FillSchema.create({
       checklistId,
       driverId,
@@ -192,31 +202,6 @@ export const getchecklistbyid = asyncHandler(async (req, res) => {
   }
 });
 
-// export const addchecklist = asyncHandler(async (req, res) => {
-//   try {
-//     const { title, driver, answers, created_by , position, department , branches} = req.body;
-
-//     const checklistData = {
-//       title,
-//       driver,
-//       answers,
-//       position, 
-//       department,
-//       branches,
-//       created_by
-//     };
-
-//     const checklist = new Schema(checklistData);
-//     const saved = await checklist.save();
-
-//     res.status(201).json({ success: true, data: saved });
-//   } catch (err) {
-//     console.error("Checklist Create Error:", err);
-//     res.status(500).json({ success: false, message: "Server Error" });
-//   }
-// });
-
-
 export const addchecklist = asyncHandler(async (req, res) => {
   console.log("🟢 API Hit: addchecklist");
   console.log("req.body.title =>", req.body.title);
@@ -305,8 +290,6 @@ export const addchecklist = asyncHandler(async (req, res) => {
   }
 });
 
-
-
 export const updatechecklist = asyncHandler(async (req, res) => {
   try {
     const data = await Schema.findByIdAndUpdate(
@@ -330,6 +313,7 @@ export const deletechecklist = asyncHandler(async (req, res) => {
     res.status(404).json({ error: error.message, message: "checklist not deleted", sucess: false });
   }
 });
+
 export const deletefillchecklist = asyncHandler(async (req, res) => {
   try {
     const data = await FillSchema.findByIdAndDelete(req.params.id);
@@ -414,9 +398,6 @@ export const getresponse = asyncHandler(async (req, res) => {
 
 }
 );
-
-
-
 
 export const getfillchecklist = async (req, res) => {
   try {
