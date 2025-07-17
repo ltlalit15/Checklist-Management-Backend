@@ -466,9 +466,8 @@ export const getAllCheckListData = async (req, res) => {
     const response = await FillSchema.find()
       .populate("checklistId", "title answers")
       .populate("driverId", "username")
-      .populate("BranchId", "_id")
-      // .select("-signature");
-
+      .populate("BranchId", "branchName")
+    // .select("-signature");
     const formatted = response.map((entry) => {
       const checklist = entry.checklistId;
       const filledAnswers = entry?.answers;
@@ -481,7 +480,6 @@ export const getAllCheckListData = async (req, res) => {
         const selectedOption = question?.options?.find(
           (opt) => opt._id?.toString() === filled.answerId?.toString()
         );
-        console.log("ssssssssssssssss", question);
         return {
           question: question?.question,
           type: question?.questionType || "N/A",
@@ -493,13 +491,13 @@ export const getAllCheckListData = async (req, res) => {
           comment: filled.comment || "",
         };
       });
-
       return {
         fillId: entry._id,
         checklistTitle: checklist?.title || "N/A",
         driver: entry.driverId?.username || "Unknown",
-        branchId: entry.BranchId?._id || "",
+        branchId: entry.BranchId?.branchName || "",
         answers: structuredAnswers,
+        signature: entry.signature,
         createdAt: entry.createdAt,
         updatedAt: entry.updatedAt,
       };

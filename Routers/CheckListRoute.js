@@ -1,15 +1,15 @@
 import express from "express";
-import { getallchecklist, getchecklistbyid, addchecklist, fillchecklist,deletefillchecklist, getAllCheckListData, getfillchecklist, deletechecklist, updatechecklist, getresponse, getchecklistByDriverid } from "../Controllers/CheckListCtrl.js";
+import { getallchecklist, getchecklistbyid, addchecklist, fillchecklist, deletefillchecklist, getAllCheckListData, getfillchecklist, deletechecklist, updatechecklist, getresponse, getchecklistByDriverid } from "../Controllers/CheckListCtrl.js";
 import { authMiddleware } from "../Middewares/authMiddleware.js";
 import { upload } from "../Middewares/uploadChecklistimag.js";
-import {uploadData} from "../Controllers/CheckListCtrl.js"
+import { uploadData } from "../Controllers/CheckListCtrl.js"
 const router = express.Router();
 
 router.get("/checklist", getallchecklist);
 router.get("/getchecklistByDriverid", getchecklistByDriverid);
 router.get("/getchecklistbyid/:id", getchecklistbyid);
 router.post("/createchecklist", uploadData.array('images'), addchecklist);
-router.post("/fillchecklist", uploadData.array("images"),fillchecklist)
+router.post("/fillchecklist", uploadData.array("images"), fillchecklist)
 router.get("/fillchecklist/:driverId", getfillchecklist)
 router.get("/getallfillchecklist", getAllCheckListData)
 
