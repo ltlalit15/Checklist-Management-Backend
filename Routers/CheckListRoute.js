@@ -12,6 +12,7 @@ router.post("/createchecklist", uploadData.array('images'), addchecklist);
 router.post("/fillchecklist", uploadData.array("images"), fillchecklist)
 router.get("/fillchecklist/:driverId", getfillchecklist)
 router.get("/getallfillchecklist", getAllCheckListData)
+router.get("/getallfillchecklist", getAllCheckListDatabyDriverId)
 
 router.post(
     "/checklist/upload-answer-image",
