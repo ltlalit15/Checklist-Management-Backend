@@ -547,7 +547,7 @@ export const getAllCheckListData = async (req, res) => {
 };
 export const getAllCheckListDatabyDriverId = async (req, res) => {
   try {
-    const response = await FillSchema.find(req.params.driverId)
+const response = await FillSchema.find({ driverId: req.params.driverId })
       .populate("checklistId", "title answers")
       .populate("driverId", "username")
       .populate("BranchId", "branchName");
