@@ -3,7 +3,7 @@ import Driver from "../Models/DriverModel.js";
 import User from "../Models/UserModel.js";
 import Role from "../Models/RoleModel.js";
 import mongoose from "mongoose";
-import Branch from "../Models/BranchModel.js"
+import Branch from "../Models/RouteModels.js"
 import Permission from "../Models/PermissionModel.js";
 import asyncHandler from "express-async-handler";
 import { generateToken } from "../Config/jwtToken.js";
@@ -63,13 +63,14 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   delete user.__v;
 
   const token = generateToken(foundUser._id);
-  console.log(foundUser._id, "foundUser._id");
   const userRole = await Role.findOne({ _id: new mongoose.Types.ObjectId(foundUser.role) });
-  console.log("userRole", userRole);
+  const findBranch = await Branch.findOne({ username: foundUser._id }).populate('branchCode', "branchName")
+
   res.status(200).json({
     message: "Login successful",
     roleId: userRole ? userRole._id : null,
     roleName: userRole ? userRole.roleName : role,
+    assignBranch: findBranch?.branchCode?.branchName || "No Branch Assign",
     user,
     token,
   });
