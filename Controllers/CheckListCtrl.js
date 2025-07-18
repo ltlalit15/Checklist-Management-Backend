@@ -545,6 +545,67 @@ export const getAllCheckListData = async (req, res) => {
     });
   }
 };
+export const getAllCheckListDatabyDriverId = async (req, res) => {
+  try {
+    const response = await FillSchema.find(req.params.driverId)
+      .populate("checklistId", "title answers")
+      .populate("driverId", "username")
+      .populate("BranchId", "branchName");
+
+    const formatted = response.map((entry) => {
+      const checklist = entry.checklistId;
+      const filledAnswers = entry?.answers;
+
+      const structuredAnswers = filledAnswers.map((filled) => {
+        const question = checklist?.answers.find(
+          (q) => q._id?.toString() === filled.questionId?.toString()
+        );
+
+        const selectedOption = question?.options?.find(
+          (opt) => opt._id?.toString() === filled.answerId?.toString()
+        );
+
+        return {
+          questionId: filled.questionId,
+          question: question?.question || "N/A",
+          type: question?.questionType || "N/A",
+          required: question?.required || false,
+          instruction: question?.instruction || "",
+          answerComment: filled?.answerComment || "",
+          selectedAnswer: {
+            answerId: filled?.answerId || null,
+            value: filled?.answer || "",
+            choice: selectedOption?.choices || null,
+            action: selectedOption?.action || null,
+          },
+        };
+      });
+
+      return {
+        fillId: entry._id,
+        checklistTitle: checklist?.title || "N/A",
+        driver: entry.driverId?.username || "Unknown",
+        branch: entry.BranchId?.branchName || "",
+        signature: entry.signature || null,
+        answers: structuredAnswers,
+        createdAt: entry.createdAt,
+        updatedAt: entry.updatedAt,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "All filled checklists fetched successfully",
+      data: formatted,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch filled checklist data",
+      error: error.message,
+    });
+  }
+};
 
 
 
