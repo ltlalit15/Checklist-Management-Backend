@@ -34,14 +34,28 @@ const userSchema = new Schema(
     department: {
       type: String,
     },
-    driverStatus: {
-      type: Boolean,
-      default:false
-    },
-    assignVehicle: {
+    route: {
       type: String,
     },
-
+    vehicle: {
+      type: String,
+    },
+    driverStatus: {
+      type: Boolean,
+      default: false
+    },
+    assignVehicles: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Vehicle", 
+      },
+    ],
+    assignRoutes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "routes",
+      },
+    ],
     profileimage: {
       type: String,
     },

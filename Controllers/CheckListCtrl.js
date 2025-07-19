@@ -29,6 +29,14 @@ export const uploadToCloudinary = (buffer, filename) => {
     stream.end(buffer);
   });
 };
+// Upload base64 image
+export const uploadBase64ToCloudinary = async (base64String, filename) => {
+  return await cloudinary.uploader.upload(base64String, {
+    resource_type: "image",
+    public_id: filename,
+    folder: "checklists/fill-doodles"
+  });
+};
 
 export const fillchecklist = asyncHandler(async (req, res) => {
   try {
@@ -41,20 +49,22 @@ export const fillchecklist = asyncHandler(async (req, res) => {
       imageIds = [imageIds];
     }
 
-    // 🧠 Step 1: Map imageIds to uploaded files
-    const imageMap = {}; // { img0: file1, img1: file2, ... }
+    // 🗺️ Map imageIds to uploaded files
+    const imageMap = {}; // e.g. { img0: file1, img1: file2 }
     imageIds.forEach((id, index) => {
       imageMap[id] = files[index];
     });
 
+    // 🔍 Validate required fields
     if (!checklistId || !driverId || !signature || !BranchId || answers.length === 0) {
       return res.status(400).json({ message: "Missing required fields", success: false });
     }
 
-    // 🧠 Step 2: Replace image answers with Cloudinary URLs
+    // 🧠 Process each answer (handle file/image/base64)
     answers = await Promise.all(
       answers.map(async (ans) => {
-        if (ans.answer?.startsWith("__image__")) {
+        // 📁 If file-based upload
+        if (typeof ans.answer === "string" && ans.answer.startsWith("__image__")) {
           const imageKeysString = ans.answer.replace("__image__", ""); // "img0,img1"
           const imageKeys = imageKeysString.split(",");
 
@@ -62,7 +72,6 @@ export const fillchecklist = asyncHandler(async (req, res) => {
 
           for (let key of imageKeys) {
             const file = imageMap[key];
-
             if (file) {
               const imageUrl = await uploadToCloudinary(
                 file.buffer,
@@ -76,15 +85,28 @@ export const fillchecklist = asyncHandler(async (req, res) => {
 
           return {
             ...ans,
-            answer: uploadedUrls.length === 1 ? uploadedUrls[0] : uploadedUrls, // ✅ array if multiple
+            answer: uploadedUrls.length === 1 ? uploadedUrls[0] : uploadedUrls,
           };
         }
 
+        // 🎨 If canvas/doodle base64 image
+        if (typeof ans.answer === "string" && ans.answer.startsWith("data:image/")) {
+          const uploadResult = await uploadBase64ToCloudinary(
+            ans.answer,
+            `doodle_${Date.now()}`
+          );
+          return {
+            ...ans,
+            answer: uploadResult.secure_url,
+          };
+        }
+
+        // ✅ Other answers (text, option, etc.)
         return ans;
       })
     );
 
-    // 🧠 Step 3: Save to DB
+    // 📦 Save to DB
     const filledChecklist = await FillSchema.create({
       checklistId,
       driverId,
@@ -107,6 +129,7 @@ export const fillchecklist = asyncHandler(async (req, res) => {
     });
   }
 });
+
 
 
 export const getallchecklist = asyncHandler(async (req, res) => {

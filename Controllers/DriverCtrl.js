@@ -10,6 +10,7 @@ import { generateToken } from "../Config/jwtToken.js";
 import bcrypt from "bcrypt";
 import { isValidObjectId } from "../Utills/isValidObjectId.js";
 import routeModel from "../Models/RouteModels.js";
+import Vehicle from "../Models/VehicleModel.js";
 
 export const createuser = asyncHandler(async (req, res) => {
   try {
@@ -20,6 +21,8 @@ export const createuser = asyncHandler(async (req, res) => {
 
       const data = await Schema.create({
         ...req.body,
+        assignVehicles: JSON.parse(req.body.assignVehicles),
+        assignRoutes: JSON.parse(req.body.assignRoutes),
         profileimage: img,
       });
 
@@ -35,11 +38,16 @@ export const createuser = asyncHandler(async (req, res) => {
 export const loginAdmin = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
-  let foundUser = await Schema.findOne({ username });
+  let foundUser = await Schema.findOne({ username })
+    .populate("assignVehicles", "economicNumber")
+    .populate("assignRoutes", "routeNumber");
+
   let role = "driver";
 
   if (!foundUser) {
-    foundUser = await User.findOne({ username });
+    foundUser = await User.findOne({ username })
+      .populate("role")
+
 
     if (!foundUser) {
       return res.status(401).json({ message: "Invalid username or password" });
@@ -48,9 +56,6 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     role = foundUser.role;
   }
 
-  // if (foundUser.driverStatus !== true) {
-  //   return res.status(403).json({ message: "Permission denied. User is inactive." });
-  // }
   const isPasswordMatch = await bcrypt.compare(password, foundUser.password);
   if (!isPasswordMatch) {
     return res.status(401).json({ message: "Invalid username or password" });
@@ -64,14 +69,29 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
   const token = generateToken(foundUser._id);
   const userRole = await Role.findOne({ _id: new mongoose.Types.ObjectId(foundUser.role) });
-  const findBranch = await Branch.findOne({ username: foundUser._id }).populate('branchCode', "branchName")
+
+  // ✨ Optional: Simplify vehicle and route data
+  const assignVehicles = user.assignVehicles?.map(v => ({
+    _id: v._id,
+    vehicleNumber: v.economicNumber || "No Vehicle Number"
+  })) || [];
+
+  const assignRoutes = user.assignRoutes?.map(r => ({
+    _id: r._id,
+    routeNumber: r.routeNumber || "No Route Number"
+  })) || [];
 
   res.status(200).json({
     message: "Login successful",
     roleId: userRole ? userRole._id : null,
     roleName: userRole ? userRole.roleName : role,
-    assignBranch: findBranch?.branchCode?.branchName || "No Branch Assign",
-    user,
+    assignBranch: "No Branch Assign", // if you want to fetch actual branch, you can also populate that
+    user: {
+      ...user,
+      assignVehicles,
+      assignRoutes,
+      branchCode: user.branchCode || "No Branch Code",
+    },
     token,
   });
 });
@@ -136,7 +156,6 @@ export const getAllUserData = asyncHandler(async (req, res) => {
     // All users excluding password
     const allUsers = await Schema.find({}).select("-password");
 
-    // All drivers with specific role (exclude password)
     const drivers = await User.find({ role: "6858e65fefc7bf2dc8863662" }).select("-password");
 
     // Merge both arrays
@@ -191,8 +210,6 @@ export const getdriverByBranch = asyncHandler(async (req, res) => {
     });
   }
 });
-
-
 
 export const toogleStatus = asyncHandler(async (req, res) => {
   try {

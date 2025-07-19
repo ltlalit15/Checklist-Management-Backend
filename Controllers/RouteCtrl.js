@@ -84,4 +84,3 @@ export const deleteRoute = asyncHandler(async (req, res) => {
   }
 });
 
-
