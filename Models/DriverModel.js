@@ -42,7 +42,8 @@ const userSchema = new Schema(
     },
 
     isVerified: {
-      type: String,
+      type: Boolean,
+      default: false
     },
     driverStatus: {
       type: Boolean,
