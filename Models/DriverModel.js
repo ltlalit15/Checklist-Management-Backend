@@ -40,6 +40,10 @@ const userSchema = new Schema(
     vehicle: {
       type: String,
     },
+
+    isVerified: {
+      type: String,
+    },
     driverStatus: {
       type: Boolean,
       default: false
