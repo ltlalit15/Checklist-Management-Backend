@@ -131,7 +131,6 @@ export const fillchecklist = asyncHandler(async (req, res) => {
 });
 
 
-
 export const getallchecklist = asyncHandler(async (req, res) => {
   try {
     const data = await Schema.find()

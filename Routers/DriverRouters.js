@@ -10,7 +10,8 @@ import {
   getAllUser,
   getAllUserData,
   toogleStatus,
-  getdriverByBranch
+  getdriverByBranch,
+  verifymobile
 } from "../Controllers/DriverCtrl.js";
 import { uploadSingleImageToCloudinary } from "../Middewares/singleImgUpload.js";
 const router = express.Router();
@@ -23,5 +24,6 @@ router.get("/getalldriver", getAllUser);
 router.get("/getalldriverdata", getAllUserData);
 router.post("/getdriverByBranch", getdriverByBranch);
 router.patch("/toogleStatus/:id", toogleStatus);
+router.patch("/verifymobile/:id", verifymobile);
 
 export default router;

@@ -21,11 +21,11 @@ export const createuser = asyncHandler(async (req, res) => {
 
       const data = await Schema.create({
         ...req.body,
-        assignVehicles: JSON.parse(req.body.assignVehicles),
-        assignRoutes: JSON.parse(req.body.assignRoutes),
+        assignVehicles: req.body.assignVehicles,
+        assignRoutes: req.body.assignRoutes,
         profileimage: img,
       });
-
+      console.log("data", data);
       res.status(200).json({ message: "User created successfully", success: true, data });
     } else {
       res.status(409).json({ message: "Username already exists", success: false });
@@ -236,3 +236,22 @@ export const toogleStatus = asyncHandler(async (req, res) => {
   }
 });
 
+export const verifymobile = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+   const { phone , isVerified} = req.body;
+   
+    if (!phone || typeof isVerified !== 'boolean') {
+      return res.status(400).json({ message: "Invalid request data", success: false });
+    }
+    const updatedUser = await Schema.findByIdAndUpdate(
+      id,
+      { phone, isVerified },
+      { new: true }
+    );
+    res.status(200).json({ data: updatedUser, message: "User updated successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message, success: false });
+  }
+});
