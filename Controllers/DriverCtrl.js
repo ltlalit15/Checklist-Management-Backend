@@ -25,7 +25,6 @@ export const createuser = asyncHandler(async (req, res) => {
         assignRoutes: req.body.assignRoutes,
         profileimage: img,
       });
-      console.log("data", data);
       res.status(200).json({ message: "User created successfully", success: true, data });
     } else {
       res.status(409).json({ message: "Username already exists", success: false });
