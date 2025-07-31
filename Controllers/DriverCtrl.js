@@ -39,7 +39,9 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
   let foundUser = await Schema.findOne({ username })
     .populate("assignVehicles", "economicNumber")
+    .populate("branchCode", "branchName")
     .populate("assignRoutes", "routeNumber");
+
 
   let role = "driver";
 
@@ -69,7 +71,6 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   const token = generateToken(foundUser._id);
   const userRole = await Role.findOne({ _id: new mongoose.Types.ObjectId(foundUser.role) });
 
-  // ✨ Optional: Simplify vehicle and route data
   const assignVehicles = user.assignVehicles?.map(v => ({
     _id: v._id,
     vehicleNumber: v.economicNumber || "No Vehicle Number"
@@ -80,6 +81,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     routeNumber: r.routeNumber || "No Route Number"
   })) || [];
 
+  console.log("user");
   res.status(200).json({
     message: "Login successful",
     roleId: userRole ? userRole._id : null,
@@ -97,22 +99,20 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
 export const editUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+
   if (!isValidObjectId(id)) {
     return res.status(400).json({ message: "Invalid ID format", success: false });
   }
-  try {
-    const updatedData = {
-      ...req.body,
-    };
 
-    console.log("req.body", req.body);
+  try {
+    const updatedData = { ...req.body };
+
+    // ✅ Set image only if available
     if (req.uploadedImageUrl) {
       updatedData.profileimage = req.uploadedImageUrl;
     }
 
-    const updatedUser = await Schema.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    });
+    const updatedUser = await Schema.findByIdAndUpdate(id, updatedData, { new: true });
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found", success: false });

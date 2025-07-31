@@ -40,7 +40,10 @@ const userSchema = new Schema(
     vehicle: {
       type: String,
     },
-
+    branchCode: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
+    },
     isVerified: {
       type: Boolean,
       default: false
@@ -52,7 +55,7 @@ const userSchema = new Schema(
     assignVehicles: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Vehicle", 
+        ref: "Vehicle",
       },
     ],
     assignRoutes: [

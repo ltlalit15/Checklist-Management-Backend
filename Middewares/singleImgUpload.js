@@ -8,7 +8,8 @@ cloudinary.config({
 export const uploadSingleImageToCloudinary = async (req, res, next) => {
     try {
         if (!req.file) {
-            res.json("please select img")
+                 return next();
+
         }
         if (req.file) {
             const dataUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
